@@ -1,0 +1,3 @@
+---
+- include: playbooks/build-heat-stack.yml
+  #- include: playbooks/configure-galera.yml
