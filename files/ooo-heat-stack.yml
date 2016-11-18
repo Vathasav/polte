@@ -8,16 +8,16 @@ parameters:
   ssh_key_name:
     description: The name of the SSH key in OpenStack to add to hosts.
     type: string
-  etherpad_node_flavor:
+  api_node_flavor:
     description: The flavor to use for the VM running Etherpad.
     type: string
-  etherpad_node_image:
+  api_node_image:
     description: The image to use for the VM running Etherpad.
     type: string
-  etherpad_network:
+  ooo_network:
     description: The network to use for the VM running Etherpad.
     type: string
-  etherpad_node_allow_ssh_cidr:
+  api_node_allow_ssh_cidr:
     description: The CIDR where SSH is allowed to the frontend from.
     type: string
   galera_node_flavor:
@@ -26,12 +26,18 @@ parameters:
   galera_node_image:
     description: The image to use for Galera nodes.
     type: string
+  puppet_node_flavor:
+    description: The flavor to use for Puppet nodes.
+    type: string
+  puppet_node_image:
+    description: The image to use for Puppet nodes.
+    type: string
   floating_ip_pool:
     type: string
     label: Floating IP pool
     description: The pool from which floating IPs should be reserved.
     default: 'public'
-  etherpad_network_cidr:
+  ooo_network_cidr:
     type: string
     description: The CIDR of the internal network for the instances
     default: '192.168.1.0/24'
@@ -40,11 +46,11 @@ resources:
   backend_secgroup:
     type: OS::Neutron::SecurityGroup
     properties:
-      name: etherpad_backend_secgroup
+      name: ooo_backend_secgroup
       rules:
         - protocol: tcp
         - protocol: tcp
-          remote_ip_prefix: { get_param: etherpad_network_cidr }
+          remote_ip_prefix: { get_param: ooo_network_cidr }
           port_range_min: 3306
           port_range_max: 3306
         - protocol: tcp
@@ -60,47 +66,58 @@ resources:
           port_range_min: 4568
           port_range_max: 4568
         - protocol: tcp
-          remote_ip_prefix: { get_param: etherpad_network_cidr }
+          remote_ip_prefix: { get_param: ooo_network_cidr }
+          port_range_min: 22
+          port_range_max: 22
+
+  puppet_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: ooo_puppet_secgroup
+      rules:
+        - protocol: tcp
+        - protocol: tcp
+          remote_ip_prefix: { get_param: ooo_network_cidr }
+          port_range_min: 8140
+          port_range_max: 8140
+        - protocol: tcp
+          remote_ip_prefix: { get_param: ooo_network_cidr }
           port_range_min: 22
           port_range_max: 22
 
   frontend_secgroup:
     type: OS::Neutron::SecurityGroup
     properties:
-      name: etherpad_frontend_secgroup
+      name: ooo_frontend_secgroup
       rules:
         - protocol: tcp
-          remote_ip_prefix: { get_param: etherpad_node_allow_ssh_cidr }
+          remote_ip_prefix: { get_param: api_node_allow_ssh_cidr }
           port_range_min: 22
           port_range_max: 22
-        - protocol: tcp
-          remote_ip_prefix: '0.0.0.0/0'
-          port_range_min: 9001
-          port_range_max: 9001
 
-  etherpad_public_ip:
+  api_public_ip:
     type: OS::Nova::FloatingIP
     properties:
       pool: { get_param: floating_ip_pool }
 
-  etherpad_node:
+  api_node:
     type: OS::Nova::Server
     properties:
-      name: etherpad_node
-      flavor: { get_param: etherpad_node_flavor }
-      image: { get_param: etherpad_node_image }
+      name: api_node
+      flavor: { get_param: api_node_flavor }
+      image: { get_param: api_node_image }
       key_name: { get_param: ssh_key_name }
       security_groups:
         - { get_resource: frontend_secgroup }
       networks:
-        - network: { get_param: etherpad_network }
-      metadata: { 'ansible_group': 'etherpad' }
+        - network: { get_param: ooo_network }
+      metadata: { 'ansible_group': 'api' }
 
-  etherpad_floating_ip_association:
+  api_floating_ip_association:
     type: OS::Nova::FloatingIPAssociation
     properties:
-      floating_ip: { get_resource: etherpad_public_ip }
-      server_id: { get_resource: etherpad_node }
+      floating_ip: { get_resource: api_public_ip }
+      server_id: { get_resource: api_node }
 
   galera_nodes:
     type: OS::Heat::ResourceGroup
@@ -116,13 +133,29 @@ resources:
           security_groups:
             - { get_resource: backend_secgroup }
           networks:
-            - network: { get_param: etherpad_network }
+            - network: { get_param: ooo_network }
           metadata: { 'ansible_group': 'galera' }
 
+  puppet_node:
+    type: OS::Nova::Server
+    properties:
+      name: puppet_node
+      flavor: { get_param: puppet_node_flavor }
+      image: { get_param: puppet_node_image }
+      key_name: { get_param: ssh_key_name }
+      security_groups:
+        - { get_resource: puppet_secgroup }
+      networks:
+        - network: { get_param: ooo_network }
+      metadata: { 'ansible_group': 'puppet' }
+
 outputs:
-  etherpad_node:
-    description: The Etherpad node
-    value: { get_attr: [etherpad_node, show] }
+  api_node:
+    description: The API node
+    value: { get_attr: [api_node, show] }
   galera_nodes_group:
     description: The group of Galera nodes
     value: { get_attr: [galera_nodes, show] }
+  puppet_node:
+    description: The puppet node
+    value: { get_attr: [puppet_node, show] }

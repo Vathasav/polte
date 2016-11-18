@@ -1,11 +1,13 @@
 # This is an example parameter file for Heat. The minimum set of deployment
 # specific parameters to set for Heat are documented here.
 parameter_defaults:
-  ssh_key_name:
-  etherpad_node_flavor:
-  etherpad_node_image:
-  etherpad_node_allow_ssh_cidr:
-  galera_node_flavor:
-  galera_node_image:
-  etherpad_network:
-  etherpad_network_cidr:
+  ssh_key_name: yubikal
+  api_node_flavor: standard.small
+  api_node_image: CentOS-7.0
+  api_node_allow_ssh_cidr: 0.0.0.0/0
+  galera_node_flavor: standard.small
+  galera_node_image: CentOS-7.0
+  puppet_node_flavor: standard.small
+  puppet_node_image: CentOS-7.0
+  ooo_network: project_2000168
+  ooo_network_cidr: 192.168.1.0/24
