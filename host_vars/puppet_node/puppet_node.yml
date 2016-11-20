@@ -1,0 +1,8 @@
+---
+repos:
+  - { name: "EPEL", url: "http://www.nic.funet.fi/pub/mirrors/fedora.redhat.com/pub/epel/7/x86_64/", pkgname: "epel-release" }
+  - { name: "Puppet", url: "https://yum.puppetlabs.com/el/7/products/x86_64/", pkgname: "puppetlabs-release" }
+fqdn: "puppet_node"
+puppetmaster_fqdn: "{{ fqdn }}"
+ansible_fqdn: "{{ fqdn }}"
+root_password: "{{ lookup('password', 'credentials/'+ inventory_hostname  +'_rootpw length=15') }}"

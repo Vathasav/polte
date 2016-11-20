@@ -1,0 +1,3 @@
+---
+puppet_environment: master
+puppet_environments_repo: "{{vault_puppet_environments_repo}}"
