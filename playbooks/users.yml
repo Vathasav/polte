@@ -1,0 +1,8 @@
+- name: Configure users
+  hosts: all
+  gather_facts: false
+  tags: create_users
+  remote_user: cloud-user
+  become: true
+  roles:
+    - ansible-role-users
