@@ -5,6 +5,7 @@ date (yet)*
 
 * Install roles
 * Add vault file(s)
+* Load keys into environment
 * Run:
 
 `ansible-playbook site.yml --ask-vault-pass`

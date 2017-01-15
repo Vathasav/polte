@@ -5,4 +5,4 @@
   become: true
   become_user: root
   roles:
-    - { role: ansible-role-puppetmaster,  env_deploy_shell_prefix: "sudo -E -s" } 
+    - { role: ansible-role-puppetmaster }

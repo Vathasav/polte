@@ -2,3 +2,5 @@ roles
 credentials
 *.pkcs7.pem
 vault.yml
+*.retry
+
