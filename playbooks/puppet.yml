@@ -5,4 +5,4 @@
   become: true
   become_user: root
   roles:
-    - { role: ansible-role-puppetmaster }
+    - role: ansible-role-puppetmaster
