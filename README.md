@@ -4,8 +4,8 @@
 date (yet)*
 
 * Install roles
-* Add vault file(s)
-* Load keys into environment
+* Add vault file providing vault_puppet_environments_repo var for puppet_node
+* Load keys (see readme in ansible-role-puppetmaster)
 * Run:
 
 `ansible-playbook site.yml --ask-vault-pass`
