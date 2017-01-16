@@ -10,7 +10,7 @@
 - src: https://github.com/CSC-IT-Center-for-Science/ansible-role-puppetmaster.git
   scm: git
   path: roles
+  version: cloud-OoO-workarounds
 
 - src: https://github.com/CSC-IT-Center-for-Science/ansible-role-users
   path: roles
-

@@ -1,8 +1,7 @@
 heat_template_version: 2015-10-15
 
 description: >
-  Build machines for a deployment of Etherpad with a separate database backend
-  on OpenStack.
+  Build machines for deployment of OpenStack.
 
 parameters:
   ssh_key_name:
