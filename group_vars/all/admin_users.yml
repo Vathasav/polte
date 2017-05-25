@@ -37,13 +37,6 @@ adminusers:
     groups: "{{admingroup}}"
     shell: "{{adminshell}}"
     pubkey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDkwIW8zSsQ4Imo38dHUKuedr2ojnegnrrWAq1sqOEaqpzlQ8zXhe4hIfEp8yHBZnMlKv8WtG60GOcDx71W2KSOcZGUb3dFwmRCdAnZ+aS/vWZk5fTZUqRTJGOhaRg7gDztKVxOFg26ACEZKTiqGmT5v5oTPLGJKqENXhuAZ/NpG1caZeiCcz5ucPCubFZVHkpz5/D0W6CkL+GQUP7cuiFTnevangbkPQLv3YLvWc1nU1fELoYsp58c6Zah81zXONaHAkYRhiwGWsr9ke7k/pVzxyXyt3c0Rl1WuyYZ2EQLYuongA3dYmPH6cUC99zhIympbCKMBxHD5WUgZqc3IqZGliOKb2DC+q4/Xex7sEimsxv0t0mx4mODuBgQAXJaV1rLN9SgCCwgzW3+RCaxwG8kdbvUkqvOZ0wHAf49qiOOqBVM0z9yXzS3+xalDbaaxE9+vQeLY/4fJBy9kJCDGo2bpl6f4kaigeNHNPnMu3T477QMZ7XgjOSui11r7MGjl1WV++SX7mgxVLWlMfsuIypvPPTcdMBGlLn5+qznmvldUj9aobQ3bMCPHTmE0/hNzmRMPYlzpudw+O9bnG2QnjBeeBef4JCWWShtCxgMShCvb/sbq5iw03oVxnSQX2cJ24SyHNr8N3a2anW6zE6yScCnIzeHmWpYdpXCjNNtY8RLjQ=="
-  - name: pkoskine
-    state: present
-    uid: 856
-    group: pkoskine
-    groups: "{{admingroup}}"
-    shell: "{{adminshell}}"
-    pubkey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDSvxtM0lwEBbrKO4FSVooTii2v7y5UMDbkkDgqeaSYDbGlrjyXBQZuMnm1OZkjFXjmhrXaMWWyzY5Q1uGGoJLLTNwGjn1MCIW1r9/xbnJeyCr6/jLvnQaDoCbzHfW24KWtjrholxfVBZyFRydx7smjVI92skon2E5aBNVz7pZ6UPuQ4KU/M2gEZ7rvNsFHzw8bkMYCATfCGvFRAUiIR/AFsdmB5aD7U3RDHMtHG+dnoZnGR+c3oSLUYo1G9KVmg+k/7+ASukmj8Lyyt9l0QgrQL+usOo8RlylTDTVLknkEG4ko8XI95yFL3ZhSw5z4h1mz6YloefaviWATeIVB/9wn pkoskine@dragon.x.csc.fi"
   - name: okraemer
     state: present
     uid: 90005

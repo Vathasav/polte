@@ -1,5 +1,5 @@
 ---
-fqdn: "puppet_node"
+fqdn: "{{ inventory_hostname }}"
+#ansible_fqdn: "{{hostvars['puppetnode']['inventory_hostname']}}"
 puppetmaster_fqdn: "{{ fqdn }}"
-ansible_fqdn: "{{ fqdn }}"
 root_password: "{{ lookup('password', 'credentials/'+ inventory_hostname  +'_rootpw length=15') }}"

@@ -1,5 +1,5 @@
 [api]
-api_node ansible_ssh_host={{ hostvars['api_node']['ansible_ssh_host'] }}
+api-node ansible_ssh_host={{ hostvars['api-node']['ansible_ssh_host'] }}
 
 [galera]
 {% for node in groups['galera'] %}
@@ -7,4 +7,4 @@ api_node ansible_ssh_host={{ hostvars['api_node']['ansible_ssh_host'] }}
 {% endfor %}
 
 [puppet]
-puppet_node ansible_ssh_host={{ hostvars['puppet_node']['ansible_ssh_host'] }}
+puppetnode ansible_ssh_host={{ hostvars['puppetnode']['ansible_ssh_host'] }}

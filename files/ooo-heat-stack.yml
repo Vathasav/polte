@@ -102,7 +102,7 @@ resources:
   api_node:
     type: OS::Nova::Server
     properties:
-      name: api_node
+      name: api-node
       flavor: { get_param: api_node_flavor }
       image: { get_param: api_node_image }
       key_name: { get_param: ssh_key_name }
@@ -125,7 +125,7 @@ resources:
       resource_def:
         type: OS::Nova::Server
         properties:
-          name: galera_node%index%
+          name: galera-node%index%
           flavor: { get_param: galera_node_flavor }
           image: { get_param: galera_node_image }
           key_name: { get_param: ssh_key_name }
@@ -138,7 +138,7 @@ resources:
   puppet_node:
     type: OS::Nova::Server
     properties:
-      name: puppet_node
+      name: puppetnode
       flavor: { get_param: puppet_node_flavor }
       image: { get_param: puppet_node_image }
       key_name: { get_param: ssh_key_name }

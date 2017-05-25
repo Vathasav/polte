@@ -7,7 +7,7 @@ date (yet)*
 
 `$ ansible-galaxy -r requirements.yml install`
 
-* Add vault file providing vault_puppet_environments_repo var for puppet_node
+* Add vault file providing vault_puppet_environments_repo var for puppetnode
 * Load keys (see readme in ansible-role-puppetmaster)
 * Run:
 
