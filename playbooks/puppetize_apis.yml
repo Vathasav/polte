@@ -1,0 +1,25 @@
+---
+# First we run Puppet on the "primary" API node. This is a necessary step as
+# opposed to just running it on all at the same time, since setting up DRBD and
+# Pacemaker must be done this way.
+- hosts: api[0]
+  become: true
+  become_user: root
+  roles:
+    - ansible-role-puppetize
+
+# Then we run Puppet on the rest of the API nodes.
+- hosts: api:!api[0]
+  become: true
+  become_user: root
+  roles:
+    - ansible-role-puppetize
+
+# Finally we run Puppet on the API servers once more. This is to make sure any
+# changes created by the Puppet runs to the PuppetDB get propagated. This also
+# turns fencing on on these servers.
+- hosts: api
+  become: true
+  become_user: root
+  roles:
+    - ansible-role-puppetize

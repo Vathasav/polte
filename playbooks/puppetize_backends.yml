@@ -1,0 +1,23 @@
+---
+# Run Puppet on the first backend node only. Needed to initialize MongoDB
+# without authentication enabled.
+- hosts: galera[0]
+  become: true
+  become_user: root
+  roles:
+    - ansible-role-puppetize
+
+# Then we run Puppet on the rest of the backend nodes.
+- hosts: galera:!galera[0]
+  become: true
+  become_user: root
+  roles:
+    - ansible-role-puppetize
+
+# Finally run Puppet on the first backend node again so the cluster gets
+# properly formed
+- hosts: galera[0]
+  become: true
+  become_user: root
+  roles:
+    - ansible-role-puppetize

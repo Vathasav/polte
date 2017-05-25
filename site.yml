@@ -1,5 +1,6 @@
 ---
 - include: playbooks/build-heat-stack.yml
+- include: playbooks/openstacklocal_domain.yml
 #- include: playbooks/users.yml
 - include: playbooks/puppet.yml
 - include: playbooks/puppetize.yml

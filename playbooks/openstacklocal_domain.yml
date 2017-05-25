@@ -1,0 +1,22 @@
+## Workaround: change novalocal to openstacklocal
+- hosts: all
+  become: yes
+  become_user: root
+  tasks:
+    - name: Generate /etc/hosts file
+      template:
+        src: templates/hosts.j2
+        dest: /etc/hosts
+    - name: Add hostname config
+      lineinfile:
+        dest: /etc/cloud/cloud.cfg.d/99_hostname.cfg
+        create: yes
+        state: present
+        line: "hostname: {{ inventory_hostname }}.openstacklocal"
+      notify:
+        - reboot
+  handlers:
+    - name: reboot
+      shell: sleep 5 && shutdown -r now
+      poll: 0
+      ignore_errors: true
