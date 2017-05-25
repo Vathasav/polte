@@ -10,12 +10,12 @@
         template: "../files/ooo-heat-stack.yml"
         environment:
           - "{{ heat_environment_file }}"
-
-- hosts: localhost
-  gather_facts: no
-  connection: local
-  tasks:
-    - debug: msg="{{ heat_stack.stack.outputs }}"
+#
+# - hosts: localhost
+#   gather_facts: no
+#   connection: local
+#   tasks:
+#     - debug: msg="{{ heat_stack.stack.outputs }}"
 
 - hosts: localhost
   gather_facts: no
