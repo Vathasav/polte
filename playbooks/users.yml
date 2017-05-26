@@ -5,4 +5,4 @@
   remote_user: cloud-user
   become: true
   roles:
-    - ansible-role-users
+    - { role: ansible-role-users, bootstrap_user: "cloud-user" }
