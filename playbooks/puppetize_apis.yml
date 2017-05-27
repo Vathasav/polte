@@ -6,14 +6,14 @@
   become: true
   become_user: root
   roles:
-    - ansible-role-puppetize
+    - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal" }
 
 # Then we run Puppet on the rest of the API nodes.
 - hosts: api:!api[0]
   become: true
   become_user: root
   roles:
-    - ansible-role-puppetize
+    - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal" }
 
 # Finally we run Puppet on the API servers once more. This is to make sure any
 # changes created by the Puppet runs to the PuppetDB get propagated. This also
@@ -22,4 +22,4 @@
   become: true
   become_user: root
   roles:
-    - ansible-role-puppetize
+    - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal" }

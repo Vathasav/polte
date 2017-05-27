@@ -3,6 +3,7 @@
   become: yes
   become_user: root
   tasks:
+    - meta: clear_host_errors
     - name: Generate /etc/hosts file
       template:
         src: templates/hosts.j2
@@ -12,12 +13,18 @@
         dest: /etc/cloud/cloud.cfg.d/99_hostname.cfg
         create: yes
         state: present
-        line: "hostname: {{ inventory_hostname }}.openstacklocal"
+        line: "hostname: {{ inventory_hostname_short }}.openstacklocal"
       notify:
-        - reboot
+        - Reboot
+    - meta: flush_handlers
+    - name: Wait a bit
+      pause:
+        seconds: 10
+    - meta: clear_host_errors
+
   handlers:
-    - name: reboot
-      shell: sleep 2 && shutdown -r now
+    - name: Reboot
+      shell: sleep 5 && shutdown -r now
       async: 1
       poll: 0
       ignore_errors: true

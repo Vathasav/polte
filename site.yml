@@ -1,6 +1,15 @@
 ---
+# Build heat stack
 - include: playbooks/build-heat-stack.yml
+
+# Force all nodes to the ".openstacklocal" domain
 - include: playbooks/openstacklocal_domain.yml
-- include: playbooks/users.yml
-- include: playbooks/puppet.yml
+
+# Bootstrap and puppetize puppetmaster
+- include: playbooks/puppetmaster.yml
+
+# Puppetize nodes
 - include: playbooks/puppetize.yml
+
+# Add users - not required yet
+#- include: playbooks/users.yml
