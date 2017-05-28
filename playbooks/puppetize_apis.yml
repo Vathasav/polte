@@ -5,7 +5,25 @@
 - hosts: api[0]
   become: true
   become_user: root
+  pre_tasks:
+# workaround: selinux blocks rabbitmq HiPE compilation
+    - shell: sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config;reboot
+      args:
+        creates: /usr/bin/pip-python
+      ignore_errors: true
+    - meta: clear_host_errors
+# workaround: pip provider fails
+    - shell: ln -s /usr/bin/pip /usr/bin/pip-python
+      args:
+        creates: /usr/bin/pip-python
+# workaround: create NFS share for glance
+    - file:
+        path: /mnt/glance_nfs/cloud_devel
+        state: directory
+        recurse: yes
+        mode: 0755
   roles:
+    - { role: ansible-role-nfs, nfs_exports: { "/mnt/glance_nfs/cloud_devel *(rw,sync,no_root_squash)" } }
     - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal" }
 
 # Then we run Puppet on the rest of the API nodes.

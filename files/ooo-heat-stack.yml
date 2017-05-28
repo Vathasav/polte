@@ -8,16 +8,16 @@ parameters:
     description: The name of the SSH key in OpenStack to add to hosts.
     type: string
   api_node_flavor:
-    description: The flavor to use for the VM running Etherpad.
+    description: The flavor to use for the VMs running OpenStack APIs.
     type: string
   api_node_image:
-    description: The image to use for the VM running Etherpad.
+    description: The image to use for the VMs running OpenStack APIs.
     type: string
   ooo_network:
-    description: The network to use for the VM running Etherpad.
+    description: The network to use for the VMs.
     type: string
-  api_node_allow_ssh_cidr:
-    description: The CIDR where SSH is allowed to the frontend from.
+  jumphost_allow_ssh_cidr:
+    description: The CIDR where SSH is allowed to the jumphost from.
     type: string
   galera_node_flavor:
     description: The flavor to use for Galera nodes.
@@ -47,18 +47,16 @@ resources:
     properties:
       name: ooo_backend_secgroup
       rules:
-#        - protocol: tcp
+        - protocol: tcp
         - protocol: tcp
           remote_ip_prefix: { get_param: ooo_network_cidr }
           port_range_min: 3306
           port_range_max: 3306
         - protocol: tcp
-#          remote_mode: remote_group_id
           remote_ip_prefix: { get_param: ooo_network_cidr }
           port_range_min: 4444
           port_range_max: 4444
         - protocol: tcp
-#          remote_mode: remote_group_id
           remote_ip_prefix: { get_param: ooo_network_cidr }
           port_range_min: 4567
           port_range_max: 4567
@@ -67,7 +65,6 @@ resources:
           port_range_min: 4567
           port_range_max: 4567
         - protocol: tcp
-#          remote_mode: remote_group_id
           remote_ip_prefix: { get_param: ooo_network_cidr }
           port_range_min: 4568
           port_range_max: 4568
@@ -92,6 +89,14 @@ resources:
           port_range_max: 8140
         - protocol: tcp
           remote_ip_prefix: { get_param: ooo_network_cidr }
+          port_range_min: 8081
+          port_range_max: 8081
+        - protocol: tcp
+          remote_ip_prefix: { get_param: ooo_network_cidr }
+          port_range_min: 22
+          port_range_max: 22
+        - protocol: tcp
+          remote_ip_prefix: { get_param: jumphost_allow_ssh_cidr }
           port_range_min: 22
           port_range_max: 22
 
@@ -101,33 +106,48 @@ resources:
       name: ooo_frontend_secgroup
       rules:
         - protocol: tcp
-          remote_ip_prefix: { get_param: api_node_allow_ssh_cidr }
+          remote_ip_prefix: { get_param: ooo_network_cidr }
           port_range_min: 22
           port_range_max: 22
 
-  api_public_ip:
+  api_nodes:
+    type: OS::Heat::ResourceGroup
+    properties:
+      count: 2
+      resource_def:
+        type: OS::Nova::Server
+        properties:
+          name: api-node%index%
+          flavor: { get_param: api_node_flavor }
+          image: { get_param: api_node_image }
+          key_name: { get_param: ssh_key_name }
+          security_groups:
+            - { get_resource: frontend_secgroup }
+          networks:
+            - network: { get_param: ooo_network }
+          metadata: { 'ansible_group': 'api' }
+
+  api_public_ip_0:
     type: OS::Nova::FloatingIP
     properties:
       pool: { get_param: floating_ip_pool }
 
-  api_node:
-    type: OS::Nova::Server
+  api_public_ip_1:
+    type: OS::Nova::FloatingIP
     properties:
-      name: api-node
-      flavor: { get_param: api_node_flavor }
-      image: { get_param: api_node_image }
-      key_name: { get_param: ssh_key_name }
-      security_groups:
-        - { get_resource: frontend_secgroup }
-      networks:
-        - network: { get_param: ooo_network }
-      metadata: { 'ansible_group': 'api' }
+      pool: { get_param: floating_ip_pool }
 
-  api_floating_ip_association:
+  api_floating_ip_association_0:
     type: OS::Nova::FloatingIPAssociation
     properties:
-      floating_ip: { get_resource: api_public_ip }
-      server_id: { get_resource: api_node }
+      floating_ip: { get_resource: api_public_ip_0 }
+      server_id: { get_attr: [api_nodes, resource.0] }
+
+  api_floating_ip_association_1:
+    type: OS::Nova::FloatingIPAssociation
+    properties:
+      floating_ip: { get_resource: api_public_ip_1 }
+      server_id: { get_attr: [api_nodes, resource.1] }
 
   galera_nodes:
     type: OS::Heat::ResourceGroup
@@ -159,10 +179,21 @@ resources:
         - network: { get_param: ooo_network }
       metadata: { 'ansible_group': 'puppet' }
 
+  jumphost_public_ip:
+    type: OS::Nova::FloatingIP
+    properties:
+      pool: { get_param: floating_ip_pool }
+
+  jumphost_floating_ip_association:
+    type: OS::Nova::FloatingIPAssociation
+    properties:
+      floating_ip: { get_resource: jumphost_public_ip }
+      server_id: { get_resource: puppet_node }
+
 outputs:
-  api_node:
-    description: The API node
-    value: { get_attr: [api_node, show] }
+  api_nodes_group:
+    description: The group of API nodes
+    value: { get_attr: [api_nodes, show] }
   galera_nodes_group:
     description: The group of Galera nodes
     value: { get_attr: [galera_nodes, show] }

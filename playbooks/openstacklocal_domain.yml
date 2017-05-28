@@ -1,4 +1,4 @@
-## Workaround: change novalocal to openstacklocal
+# workaround: change novalocal to openstacklocal
 - hosts: all
   become: yes
   become_user: root

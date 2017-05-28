@@ -2,11 +2,14 @@
 # Build heat stack
 - include: playbooks/build-heat-stack.yml
 
-# Force all nodes to the ".openstacklocal" domain
+# workaround: Force all nodes to the ".openstacklocal" domain
 - include: playbooks/openstacklocal_domain.yml
 
 # Bootstrap and puppetize puppetmaster
 - include: playbooks/puppetmaster.yml
+
+# workaround: Again, since puppetization touches /etc/hosts
+- include: playbooks/openstacklocal_domain.yml
 
 # Puppetize nodes
 - include: playbooks/puppetize.yml
