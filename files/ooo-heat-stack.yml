@@ -16,6 +16,9 @@ parameters:
   ooo_network:
     description: The network to use for the VMs.
     type: string
+  api_network:
+    description: The network to use for the VMs.
+    type: string
   jumphost_allow_ssh_cidr:
     description: The CIDR where SSH is allowed to the jumphost from.
     type: string
@@ -38,8 +41,12 @@ parameters:
     default: 'public'
   ooo_network_cidr:
     type: string
-    description: The CIDR of the internal network for the instances
+    description: The CIDR of the internal network for the instances.
     default: '192.168.1.0/24'
+  api_network_cidr:
+    type: string
+    description: The CIDR of the internet facing network of API nodes.
+    default: '10.42.42.0/24'
 
 resources:
   backend_secgroup:
@@ -125,6 +132,7 @@ resources:
             - { get_resource: frontend_secgroup }
           networks:
             - network: { get_param: ooo_network }
+            - network: { get_param: api_network }
           metadata: { 'ansible_group': 'api' }
 
   api_public_ip_0:

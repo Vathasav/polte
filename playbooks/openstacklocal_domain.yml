@@ -2,7 +2,13 @@
 - hosts: all
   become: yes
   become_user: root
+  gather_facts: yes
   tasks:
+    - name: Activate ext interfaces
+      shell: dhclient eth1
+      when: hostvars[inventory_hostname]['ansible_eth1'] is defined
+      no_log: true
+      ignore_errors: true
     - meta: clear_host_errors
     - name: Generate /etc/hosts file
       template:

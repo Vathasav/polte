@@ -1,17 +1,20 @@
 ---
-# First we run Puppet on the "primary" API node. This is a necessary step as
-# opposed to just running it on all at the same time, since setting up DRBD and
-# Pacemaker must be done this way.
-- hosts: api[0]
+# workarounds for both api nodes
+- hosts: api
   become: true
   become_user: root
-  pre_tasks:
+  tasks:
 # workaround: selinux blocks rabbitmq HiPE compilation
-    - shell: sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config;reboot
+    - shell: sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
+    - shell: sleep 5 && shutdown -r now
+      async: 1
+      poll: 0
       args:
         creates: /usr/bin/pip-python
       ignore_errors: true
     - meta: clear_host_errors
+    - pause:
+        seconds: 10
 # workaround: pip provider fails
     - shell: ln -s /usr/bin/pip /usr/bin/pip-python
       args:
@@ -24,14 +27,22 @@
         mode: 0755
   roles:
     - { role: ansible-role-nfs, nfs_exports: { "/mnt/glance_nfs/cloud_devel *(rw,sync,no_root_squash)" } }
-    - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal" }
+
+# First we run Puppet on the "primary" API node. This is a necessary step as
+# opposed to just running it on all at the same time, since setting up DRBD and
+# Pacemaker must be done this way.
+- hosts: api[0]
+  become: true
+  become_user: root
+  roles:
+    - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", ignore_puppetize_errors: true }
 
 # Then we run Puppet on the rest of the API nodes.
 - hosts: api:!api[0]
   become: true
   become_user: root
   roles:
-    - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal" }
+    - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", ignore_puppetize_errors: true }
 
 # Finally we run Puppet on the API servers once more. This is to make sure any
 # changes created by the Puppet runs to the PuppetDB get propagated. This also

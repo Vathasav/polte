@@ -1,4 +1,5 @@
 ---
 vm_user_account: "cloud-user"
 ooo_network_name: "compenvs"
+api_network_name: "ooo-api-net"
 heat_environment_file: "../files/example-heat-params.yml"
