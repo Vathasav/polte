@@ -4,20 +4,21 @@ description: >
   Build machines for deployment of OpenStack.
 
 parameters:
+  api_server_count:
+    type: number
+    default: 2
   ssh_key_name:
     description: The name of the SSH key in OpenStack to add to hosts.
     type: string
-  api_node_flavor:
-    description: The flavor to use for the VMs running OpenStack APIs.
+  api_node_names:
+    description: List of api node hostnames
     type: string
-  api_node_image:
-    description: The image to use for the VMs running OpenStack APIs.
-    type: string
+    default: ["api-node0", "api-node1", ]
   ooo_network:
     description: The network to use for the VMs.
     type: string
-  api_network:
-    description: The network to use for the VMs.
+  hb_network_name:
+    description: The network to use for heartbeats.
     type: string
   jumphost_allow_ssh_cidr:
     description: The CIDR where SSH is allowed to the jumphost from.
@@ -39,14 +40,15 @@ parameters:
     label: Floating IP pool
     description: The pool from which floating IPs should be reserved.
     default: 'public'
-  ooo_network_cidr:
+  ooo_subnet_cidr:
     type: string
     description: The CIDR of the internal network for the instances.
-    default: '192.168.1.0/24'
-  api_network_cidr:
+  hb_subnet_cidr:
     type: string
-    description: The CIDR of the internet facing network of API nodes.
-    default: '10.42.42.0/24'
+    description: The CIDR of the heartbeat network of API nodes.
+  hb_subnet_name:
+    type: string
+    description: The name of the heartbeat subnet of API nodes.
 
 resources:
   backend_secgroup:
@@ -56,31 +58,31 @@ resources:
       rules:
         - protocol: tcp
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_network_cidr }
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
           port_range_min: 3306
           port_range_max: 3306
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_network_cidr }
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
           port_range_min: 4444
           port_range_max: 4444
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_network_cidr }
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
           port_range_min: 4567
           port_range_max: 4567
         - protocol: udp
-          remote_ip_prefix: { get_param: ooo_network_cidr }
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
           port_range_min: 4567
           port_range_max: 4567
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_network_cidr }
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
           port_range_min: 4568
           port_range_max: 4568
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_network_cidr }
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
           port_range_min: 22
           port_range_max: 22
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_network_cidr }
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
           port_range_min: 27017
           port_range_max: 27017
 
@@ -91,15 +93,15 @@ resources:
       rules:
         - protocol: tcp
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_network_cidr }
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
           port_range_min: 8140
           port_range_max: 8140
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_network_cidr }
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
           port_range_min: 8081
           port_range_max: 8081
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_network_cidr }
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
           port_range_min: 22
           port_range_max: 22
         - protocol: tcp
@@ -112,50 +114,38 @@ resources:
     properties:
       name: ooo_frontend_secgroup
       rules:
+        - protocol: icmp
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_network_cidr }
+        - protocol: tcp
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
           port_range_min: 22
           port_range_max: 22
+
+  hb_network:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: hb_network_name }
+
+  hb_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      cidr: { get_param: hb_subnet_cidr }
+#      enable_dhcp: False
+      gateway_ip: null
+      name: { get_param: hb_subnet_name }
+      network: { get_resource: hb_network }
 
   api_nodes:
     type: OS::Heat::ResourceGroup
     properties:
-      count: 2
+      count: {get_param: api_server_count}
       resource_def:
-        type: OS::Nova::Server
+        type: api-node.yaml
         properties:
-          name: api-node%index%
-          flavor: { get_param: api_node_flavor }
-          image: { get_param: api_node_image }
-          key_name: { get_param: ssh_key_name }
-          security_groups:
-            - { get_resource: frontend_secgroup }
-          networks:
-            - network: { get_param: ooo_network }
-            - network: { get_param: api_network }
-          metadata: { 'ansible_group': 'api' }
-
-  api_public_ip_0:
-    type: OS::Nova::FloatingIP
-    properties:
-      pool: { get_param: floating_ip_pool }
-
-  api_public_ip_1:
-    type: OS::Nova::FloatingIP
-    properties:
-      pool: { get_param: floating_ip_pool }
-
-  api_floating_ip_association_0:
-    type: OS::Nova::FloatingIPAssociation
-    properties:
-      floating_ip: { get_resource: api_public_ip_0 }
-      server_id: { get_attr: [api_nodes, resource.0] }
-
-  api_floating_ip_association_1:
-    type: OS::Nova::FloatingIPAssociation
-    properties:
-      floating_ip: { get_resource: api_public_ip_1 }
-      server_id: { get_attr: [api_nodes, resource.1] }
+          index: "%index%"
+          api_node_names: { get_param: api_node_names }
+          hb_network_name: { get_param: hb_network_name }
+          ooo_frontend_secgroup: { get_resource: frontend_secgroup }
 
   galera_nodes:
     type: OS::Heat::ResourceGroup
@@ -200,8 +190,7 @@ resources:
 
 outputs:
   api_nodes_group:
-    description: The group of API nodes
-    value: { get_attr: [api_nodes, show] }
+    value: { get_attr: [api_nodes, api_node_show] }
   galera_nodes_group:
     description: The group of Galera nodes
     value: { get_attr: [galera_nodes, show] }

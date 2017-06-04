@@ -16,3 +16,13 @@ and hostvars[item]['ansible_eth1']['ipv4']['address'] is defined %}
 {{ hostvars[item]['ansible_eth1']['ipv4']['address'] }} {{ alt_name }} {{ alt_name2 }}
 {% endif %}
 {% endfor %}
+
+{% for item in play_hosts %}
+{% if 'ansible_eth2' in hostvars[item]
+and 'ipv4' in hostvars[item]['ansible_eth2']
+and hostvars[item]['ansible_eth2']['ipv4']['address'] is defined %}
+{% set alt_name = item | regex_replace('^(.*)$', '\\1.hb') %}
+{% set alt_name2 = item | regex_replace('^(.*)$', '\\1.hb.openstacklocal') %}
+{{ hostvars[item]['ansible_eth2']['ipv4']['address'] }} {{ alt_name }} {{ alt_name2 }}
+{% endif %}
+{% endfor %}

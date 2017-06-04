@@ -10,6 +10,11 @@ parameter_defaults:
   puppet_node_image: CentOS-7.0
   jumphost_allow_ssh_cidr: 0.0.0.0/0
   ooo_network: compenvs
-  ooo_network_cidr: 192.168.73.0/24
+  ooo_subnet_cidr: 192.168.73.0/24
   api_network: ooo-api-net
-  api_network_cidr: 10.42.42.0/24
+  api_network_name: ooo-api-net
+  api_subnet_cidr: 10.42.42.0/24
+  hb_network: ooo-hb-net
+  hb_network_name: ooo-hb-net
+  hb_subnet_cidr: 10.0.0.0/29
+  hb_subnet_name: ooo-hb-subnet

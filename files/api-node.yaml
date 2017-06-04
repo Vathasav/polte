@@ -1,0 +1,93 @@
+heat_template_version: 2015-10-15
+
+description: >
+  Build machines for deployment of OpenStack.
+
+parameters:
+  index:
+    type: number
+  ssh_key_name:
+    description: The name of the SSH key in OpenStack to add to hosts.
+    type: string
+  api_node_flavor:
+    description: The flavor to use for the VMs running OpenStack APIs.
+    type: string
+  api_node_image:
+    description: The image to use for the VMs running OpenStack APIs.
+    type: string
+  api_network:
+    description: The network to use for the VMs.
+    type: string
+  ooo_network:
+    description: The network to use for the VMs.
+    type: string
+  hb_network_name:
+    description: The network to use for heartbeats.
+    type: string
+  hb_subnet_name:
+    description: The network to use for heartbeats.
+    type: string
+  floating_ip_pool:
+    type: string
+    label: Floating IP pool
+    description: The pool from which floating IPs should be reserved.
+    default: 'public'
+  api_node_names:
+    type: comma_delimited_list
+  ooo_frontend_secgroup:
+    type: string
+
+resources:
+  hb_port:
+    type: OS::Neutron::Port
+    properties:
+#      allowed_address_pairs: [{"ip_address": "10.0.0.1"}, {"ip_address": "10.0.0.2"}]
+#
+# This doesn't seem to be supported by heat, yielding error:
+# "Port [uuid] requires a FixedIP in order to be used."
+# For now will do DHCP subnet which requires at least /29.
+      network: { get_param: hb_network_name }
+      fixed_ips:
+        - subnet: { get_param: hb_subnet_name }
+      security_groups:
+        - { get_param: ooo_frontend_secgroup }
+
+  api_node:
+    type: OS::Nova::Server
+    properties:
+      flavor: { get_param: api_node_flavor }
+      image: { get_param: api_node_image }
+      key_name: { get_param: ssh_key_name }
+      security_groups:
+        - ooo_frontend_secgroup
+      name: { get_param: [api_node_names, {get_param: index}] }
+      networks:
+        - network: { get_param: ooo_network }
+        - network: { get_param: api_network }
+#        - port: { get_resource: hb_port}
+        - network: { get_param: hb_network_name }
+      metadata: { 'ansible_group': 'api' }
+
+#  api_public_ip:
+#    type: OS::Nova::FloatingIP
+#    properties:
+#      pool: { get_param: floating_ip_pool }
+
+  api_public_ip_neutron:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: { get_param: floating_ip_pool }
+
+  api_floating_ip_association:
+#    type: OS::Nova::FloatingIPAssociation
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+#      floating_ip: { get_resource: api_public_ip }
+      floatingip_id: { get_resource: api_public_ip_neutron }
+#      server_id: { get_resource: api_node }
+#      port_id: {get_attr: [api_node, addresses, {get_param: api_network}, 0, port]}
+      port_id: {get_attr: [api_node, addresses, {get_param: ooo_network}, 0, port]}
+
+outputs:
+  api_node_show:
+    value: {get_attr: [api_node, show]}
