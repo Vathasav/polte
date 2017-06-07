@@ -8,11 +8,15 @@
 # Bootstrap and puppetize puppetmaster
 - include: playbooks/puppetmaster.yml
 
-# workaround: Again, since puppetization touches /etc/hosts
+# Workarounds for liberty/freeze
+- include: playbooks/puppet_environment_mods.yml
+
+# workaround: Again since pm puppetization touches /etc/hosts
 - include: playbooks/openstacklocal_domain.yml
 
 # Puppetize nodes
-- include: playbooks/puppetize.yml
+- include: playbooks/puppetize_backends.yml
+- include: playbooks/puppetize_apis.yml
 
 # Add users - not required yet
 #- include: playbooks/users.yml

@@ -1,35 +1,66 @@
+# workaround: Prevent dhcp on eth[12] touching routing or DNS
+- hosts: api
+  become: yes
+  become_user: root
+  gather_facts: yes
+  tasks:
+    - name: Modify interface network-scripts
+      blockinfile:
+        dest: /etc/sysconfig/network-scripts/ifcfg-{{ item }}
+        create: yes
+        state: present
+        block: |
+          DEVICE="{{ item }}"
+          BOOTPROTO="dhcp"
+          ONBOOT="yes"
+          PEERDNS="no"
+          DEFROUTE="no"
+      with_items:
+        - eth1
+        - eth2
+
 # workaround: change novalocal to openstacklocal
 - hosts: all
   become: yes
   become_user: root
   gather_facts: yes
   tasks:
-    - name: Activate ext interfaces
-      shell: killall dhclient;dhclient eth1
-      when: hostvars[inventory_hostname]['ansible_eth1'] is defined
-      no_log: true
-      ignore_errors: true
-    - name: Activate ext interfaces
-      shell: killall dhclient;dhclient eth2
-      when: hostvars[inventory_hostname]['ansible_eth2'] is defined
-      no_log: true
-      ignore_errors: true
     - meta: clear_host_errors
     - name: Generate /etc/hosts file
       template:
         src: templates/hosts.j2
         dest: /etc/hosts
+#    - name: Make resolv.conf unwritable
+#      shell: chattr +i /etc/resolv.conf
+#    - name: Disable IPv6
+#      blockinfile:
+#        dest: /etc/sysctl.conf
+#        create: yes
+#        state: present
+#        block: |
+#          net.ipv6.conf.all.disable_ipv6 = 1
+#          net.ipv6.conf.default.disable_ipv6 = 1
     - name: Add hostname config
-      lineinfile:
+      blockinfile:
         dest: /etc/cloud/cloud.cfg.d/99_hostname.cfg
         create: yes
         state: present
-        line: "hostname: {{ inventory_hostname_short }}.openstacklocal"
+        block: |
+          hostname: {{ inventory_hostname_short }}.openstacklocal
+#          manage_resolv_conf: true
+#          resolv_conf:
+#            nameservers: ['193.166.4.24', '193.166.4.25']
+#            domain: openstacklocal
       notify:
         - Reboot
     - meta: flush_handlers
     - pause:
         seconds: 10
+    - name: Activate interfaces
+      shell: dhclient -r eth1 eth2 && dhclient eth1 eth2
+      when: hostvars[inventory_hostname]['ansible_eth1'] is defined and hostvars[inventory_hostname]['ansible_eth2'] is defined
+      no_log: true
+      ignore_errors: true
     - meta: clear_host_errors
 
   handlers:

@@ -2,19 +2,29 @@
 # specific parameters to set for Heat are documented here.
 parameter_defaults:
   ssh_key_name: janousia
+
   api_node_flavor: standard.large
   api_node_image: CentOS-7.0
   galera_node_flavor: standard.large
   galera_node_image: CentOS-7.0
   puppet_node_flavor: standard.large
   puppet_node_image: CentOS-7.0
+
   jumphost_allow_ssh_cidr: 0.0.0.0/0
+
   ooo_network: compenvs
   ooo_subnet_cidr: 192.168.73.0/24
+
   api_network: ooo-api-net
   api_network_name: ooo-api-net
   api_subnet_cidr: 10.42.42.0/24
+
+  ext_network: ooo-ext-net
+  ext_network_name: ooo-ext-net
+  ext_subnet_name: ooo-ext-subnet
+  ext_subnet_cidr: 10.42.42.0/24
+
   hb_network: ooo-hb-net
   hb_network_name: ooo-hb-net
-  hb_subnet_cidr: 10.0.0.0/29
   hb_subnet_name: ooo-hb-subnet
+  hb_subnet_cidr: 10.0.0.0/29

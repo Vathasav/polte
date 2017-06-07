@@ -18,6 +18,9 @@ parameters:
   api_network:
     description: The network to use for the VMs.
     type: string
+  ext_network:
+    description: The network to use for the VMs.
+    type: string
   ooo_network:
     description: The network to use for the VMs.
     type: string
@@ -38,19 +41,19 @@ parameters:
     type: string
 
 resources:
-  hb_port:
-    type: OS::Neutron::Port
-    properties:
-#      allowed_address_pairs: [{"ip_address": "10.0.0.1"}, {"ip_address": "10.0.0.2"}]
-#
-# This doesn't seem to be supported by heat, yielding error:
-# "Port [uuid] requires a FixedIP in order to be used."
-# For now will do DHCP subnet which requires at least /29.
-      network: { get_param: hb_network_name }
-      fixed_ips:
-        - subnet: { get_param: hb_subnet_name }
-      security_groups:
-        - { get_param: ooo_frontend_secgroup }
+#  hb_port:
+#    type: OS::Neutron::Port
+#    properties:
+##      allowed_address_pairs: [{"ip_address": "10.0.0.1"}, {"ip_address": "10.0.0.2"}]
+##
+## This doesn't seem to be supported by heat, yielding error:
+## "Port [uuid] requires a FixedIP in order to be used."
+## For now will do DHCP subnet which requires at least /29.
+#      network: { get_param: hb_network_name }
+#      fixed_ips:
+#        - subnet: { get_param: hb_subnet_name }
+#      security_groups:
+#        - { get_param: ooo_frontend_secgroup }
 
   api_node:
     type: OS::Nova::Server
@@ -63,7 +66,7 @@ resources:
       name: { get_param: [api_node_names, {get_param: index}] }
       networks:
         - network: { get_param: ooo_network }
-        - network: { get_param: api_network }
+        - network: { get_param: ext_network }
 #        - port: { get_resource: hb_port}
         - network: { get_param: hb_network_name }
       metadata: { 'ansible_group': 'api' }
@@ -85,9 +88,9 @@ resources:
 #      floating_ip: { get_resource: api_public_ip }
       floatingip_id: { get_resource: api_public_ip_neutron }
 #      server_id: { get_resource: api_node }
-#      port_id: {get_attr: [api_node, addresses, {get_param: api_network}, 0, port]}
-      port_id: {get_attr: [api_node, addresses, {get_param: ooo_network}, 0, port]}
+      port_id: {get_attr: [api_node, addresses, {get_param: ext_network}, 0, port]}
+#      port_id: {get_attr: [api_node, addresses, {get_param: ooo_network}, 0, port]}
 
 outputs:
-  api_node_show:
+  show:
     value: {get_attr: [api_node, show]}

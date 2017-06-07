@@ -14,12 +14,6 @@ parameters:
     description: List of api node hostnames
     type: string
     default: ["api-node0", "api-node1", ]
-  ooo_network:
-    description: The network to use for the VMs.
-    type: string
-  hb_network_name:
-    description: The network to use for heartbeats.
-    type: string
   jumphost_allow_ssh_cidr:
     description: The CIDR where SSH is allowed to the jumphost from.
     type: string
@@ -40,15 +34,30 @@ parameters:
     label: Floating IP pool
     description: The pool from which floating IPs should be reserved.
     default: 'public'
+  ooo_network:
+    description: The network to use for the VMs.
+    type: string
   ooo_subnet_cidr:
     type: string
-    description: The CIDR of the internal network for the instances.
+    description: The CIDR of the internal subnet of the instances.
+  hb_network_name:
+    description: The network to use for heartbeats.
+    type: string
   hb_subnet_cidr:
     type: string
-    description: The CIDR of the heartbeat network of API nodes.
+    description: The CIDR of the heartbeat subnet of API nodes.
   hb_subnet_name:
     type: string
     description: The name of the heartbeat subnet of API nodes.
+  ext_network_name:
+    description: The network to use for API access to internet.
+    type: string
+  ext_subnet_name:
+    type: string
+    description: The name of the ext subnet of API nodes.
+  ext_subnet_cidr:
+    type: string
+    description: The CIDR of the ext subnet of API nodes.
 
 resources:
   backend_secgroup:
@@ -130,10 +139,34 @@ resources:
     type: OS::Neutron::Subnet
     properties:
       cidr: { get_param: hb_subnet_cidr }
-#      enable_dhcp: False
+#      dns_nameservers: ["193.166.4.24", "193.166.4.25"]
       gateway_ip: null
       name: { get_param: hb_subnet_name }
       network: { get_resource: hb_network }
+
+  ext_network:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: ext_network_name }
+
+  ext_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      cidr: { get_param: ext_subnet_cidr }
+#      dns_nameservers: ["193.166.4.24", "193.166.4.25"]
+      name: { get_param: ext_subnet_name }
+      network: { get_resource: ext_network }
+
+  ext_router:
+    type: OS::Neutron::Router
+    properties:
+      external_gateway_info: { network: public }
+
+  ext_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: ext_router }
+      subnet: { get_resource: ext_subnet }
 
   api_nodes:
     type: OS::Heat::ResourceGroup
@@ -190,7 +223,7 @@ resources:
 
 outputs:
   api_nodes_group:
-    value: { get_attr: [api_nodes, api_node_show] }
+    value: { get_attr: [api_nodes, show] }
   galera_nodes_group:
     description: The group of Galera nodes
     value: { get_attr: [galera_nodes, show] }

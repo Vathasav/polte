@@ -3,7 +3,7 @@
 - hosts: api
   become: true
   become_user: root
-  tasks:
+  pre_tasks:
 # workaround: selinux blocks rabbitmq HiPE compilation
     - shell: sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
     - shell: sleep 5 && shutdown -r now
@@ -14,7 +14,12 @@
       ignore_errors: true
     - meta: clear_host_errors
     - pause:
-        seconds: 10
+        seconds: 20
+    - name: Reactivate ext interfaces
+      shell: dhclient -r eth1 eth2 && dhclient eth1 eth2
+      when: hostvars[inventory_hostname]['ansible_eth1'] is defined and hostvars[inventory_hostname]['ansible_eth2'] is defined
+      no_log: true
+      ignore_errors: true
 # workaround: pip provider fails
     - shell: ln -s /usr/bin/pip /usr/bin/pip-python
       args:
