@@ -2,6 +2,9 @@
 # Build heat stack
 - include: playbooks/build-heat-stack.yml
 
+# workaround: Install and configure LDAP server
+- include: playbooks/ldap_server.yml
+
 # workaround: Force all nodes to the ".openstacklocal" domain
 - include: playbooks/openstacklocal_domain.yml
 

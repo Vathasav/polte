@@ -56,11 +56,11 @@
     - meta: flush_handlers
     - pause:
         seconds: 10
-    - name: Activate interfaces
-      shell: dhclient -r eth1 eth2 && dhclient eth1 eth2
-      when: hostvars[inventory_hostname]['ansible_eth1'] is defined and hostvars[inventory_hostname]['ansible_eth2'] is defined
-      no_log: true
-      ignore_errors: true
+#    - name: Activate interfaces
+#      shell: dhclient -r eth1 eth2 && dhclient eth1 eth2
+#      when: hostvars[inventory_hostname]['ansible_eth1'] is defined and hostvars[inventory_hostname]['ansible_eth2'] is defined
+#      no_log: true
+#      ignore_errors: true
     - meta: clear_host_errors
 
   handlers:

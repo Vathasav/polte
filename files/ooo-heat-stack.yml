@@ -23,6 +23,12 @@ parameters:
   galera_node_image:
     description: The image to use for Galera nodes.
     type: string
+  ldap_node_flavor:
+    description: The flavor to use for LDAP nodes.
+    type: string
+  ldap_node_image:
+    description: The image to use for LDAP nodes.
+    type: string
   puppet_node_flavor:
     description: The flavor to use for Puppet nodes.
     type: string
@@ -125,10 +131,31 @@ resources:
       rules:
         - protocol: icmp
         - protocol: tcp
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          port_range_min: 22
+          port_range_max: 22
+        - protocol: tcp
+          remote_ip_prefix: { get_param: ext_subnet_cidr }
+          port_range_min: 1
+          port_range_max: 65535
+
+  ldap_secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name: ooo_ldap_secgroup
+      rules:
         - protocol: tcp
           remote_ip_prefix: { get_param: ooo_subnet_cidr }
           port_range_min: 22
           port_range_max: 22
+        - protocol: tcp
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          port_range_min: 389
+          port_range_max: 389
+        - protocol: tcp
+          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          port_range_min: 636
+          port_range_max: 636
 
   hb_network:
     type: OS::Neutron::Net
@@ -139,7 +166,6 @@ resources:
     type: OS::Neutron::Subnet
     properties:
       cidr: { get_param: hb_subnet_cidr }
-#      dns_nameservers: ["193.166.4.24", "193.166.4.25"]
       gateway_ip: null
       name: { get_param: hb_subnet_name }
       network: { get_resource: hb_network }
@@ -153,7 +179,6 @@ resources:
     type: OS::Neutron::Subnet
     properties:
       cidr: { get_param: ext_subnet_cidr }
-#      dns_nameservers: ["193.166.4.24", "193.166.4.25"]
       name: { get_param: ext_subnet_name }
       network: { get_resource: ext_network }
 
@@ -210,6 +235,19 @@ resources:
         - network: { get_param: ooo_network }
       metadata: { 'ansible_group': 'puppet' }
 
+  ldap_node:
+    type: OS::Nova::Server
+    properties:
+      name: ldap-node
+      flavor: { get_param: ldap_node_flavor }
+      image: { get_param: ldap_node_image }
+      key_name: { get_param: ssh_key_name }
+      security_groups:
+        - { get_resource: ldap_secgroup }
+      networks:
+        - network: { get_param: ooo_network }
+      metadata: { 'ansible_group': 'ldap' }
+
   jumphost_public_ip:
     type: OS::Nova::FloatingIP
     properties:
@@ -230,3 +268,6 @@ outputs:
   puppet_node:
     description: The puppet node
     value: { get_attr: [puppet_node, show] }
+  ldap_node:
+    description: The LDAP node
+    value: { get_attr: [ldap_node, show] }

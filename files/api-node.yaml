@@ -15,9 +15,6 @@ parameters:
   api_node_image:
     description: The image to use for the VMs running OpenStack APIs.
     type: string
-  api_network:
-    description: The network to use for the VMs.
-    type: string
   ext_network:
     description: The network to use for the VMs.
     type: string

@@ -15,11 +15,11 @@
     - meta: clear_host_errors
     - pause:
         seconds: 20
-    - name: Reactivate ext interfaces
-      shell: dhclient -r eth1 eth2 && dhclient eth1 eth2
-      when: hostvars[inventory_hostname]['ansible_eth1'] is defined and hostvars[inventory_hostname]['ansible_eth2'] is defined
-      no_log: true
-      ignore_errors: true
+#    - name: Reactivate ext interfaces
+#      shell: dhclient -r eth1 eth2 && dhclient eth1 eth2
+#      when: hostvars[inventory_hostname]['ansible_eth1'] is defined and hostvars[inventory_hostname]['ansible_eth2'] is defined
+#      no_log: true
+#      ignore_errors: true
 # workaround: pip provider fails
     - shell: ln -s /usr/bin/pip /usr/bin/pip-python
       args:
@@ -55,5 +55,11 @@
 - hosts: api
   become: true
   become_user: root
+  pre_tasks:
+    - name: workaround - use insecure due to self-signed cert
+      lineinfile:
+        path: /bin/openstack
+        insertafter: import\ sys
+        line: "sys.argv.append('--insecure')"
   roles:
     - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal" }
