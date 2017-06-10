@@ -13,13 +13,4 @@
       openldap_enable_user_creation: true
       openldap_server_users:
         testuser:
-          password: testuser
-          fullname: testuser
-          givenname: testuser
-          surname: testuser
-          email: testuser@localhost
-          shell: /usr/bin/bash
-          phone: "555-JUGS"
-      openldap_server_groups:
-        testgroup:
-          - testuser
+          password: "{{ vault_testuser_ldap_pwd }}"

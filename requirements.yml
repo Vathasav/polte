@@ -1,15 +1,3 @@
-# - src: https://github.com/dochang/ansible-role-docker.git
-#   scm: git
-#   path: roles
-#
-# - src: https://github.com/futurice/ansible-pip.git
-#   scm: git
-#   path: roles
-#   name: ansible-role-pip
-#
-#- src: https://github.com/CSCfi/ansible-role-users
-#  path: roles
-
 - src: https://github.com/CSCfi/ansible-role-puppetmaster.git
   scm: git
   path: roles
@@ -23,6 +11,7 @@
 - src: https://github.com/geerlingguy/ansible-role-nfs.git
   path: roles
 
-- src: https://github.com/Phill93/ansible-openldap_server.git
+- src: https://github.com/junousi/ansible-openldap_server.git
   name: ansible-role-openldap-server
   path: roles
+  version: simpleusertemplate

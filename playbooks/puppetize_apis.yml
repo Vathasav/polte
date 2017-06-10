@@ -14,12 +14,7 @@
       ignore_errors: true
     - meta: clear_host_errors
     - pause:
-        seconds: 20
-#    - name: Reactivate ext interfaces
-#      shell: dhclient -r eth1 eth2 && dhclient eth1 eth2
-#      when: hostvars[inventory_hostname]['ansible_eth1'] is defined and hostvars[inventory_hostname]['ansible_eth2'] is defined
-#      no_log: true
-#      ignore_errors: true
+        seconds: 40
 # workaround: pip provider fails
     - shell: ln -s /usr/bin/pip /usr/bin/pip-python
       args:
@@ -30,6 +25,7 @@
         state: directory
         recurse: yes
         mode: 0755
+#    - meta: clear_host_errors
   roles:
     - { role: ansible-role-nfs, nfs_exports: { "/mnt/glance_nfs/cloud_devel *(rw,sync,no_root_squash)" } }
 
@@ -41,6 +37,8 @@
   become_user: root
   roles:
     - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", ignore_puppetize_errors: true }
+  post_tasks:
+    - shell: iptables -F
 
 # Then we run Puppet on the rest of the API nodes.
 - hosts: api:!api[0]
@@ -53,6 +51,7 @@
 # changes created by the Puppet runs to the PuppetDB get propagated. This also
 # turns fencing on on these servers.
 - hosts: api
+  serial: 1
   become: true
   become_user: root
   pre_tasks:
@@ -61,5 +60,6 @@
         path: /bin/openstack
         insertafter: import\ sys
         line: "sys.argv.append('--insecure')"
+      ignore_errors: true
   roles:
     - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal" }
