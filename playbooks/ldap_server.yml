@@ -14,3 +14,6 @@
       openldap_server_users:
         testuser:
           password: "{{ vault_testuser_ldap_pwd }}"
+      openldap_server_groups:
+        testgroup:
+          - testuser
