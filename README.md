@@ -5,7 +5,7 @@
 `$ ansible-galaxy -r requirements.yml install`
 
 * Modify heat parameters
-* Provide puppet_environments_repo var for puppetnode (e.g. via ansible-vault)
+* Provide puppet_environments_repo var for puppet-node (e.g. via ansible-vault)
 * Load keys (see README.md in ansible-role-puppetmaster)
 * Run:
 

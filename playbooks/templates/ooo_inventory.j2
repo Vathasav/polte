@@ -9,7 +9,7 @@
 {% endfor %}
 
 [puppet]
-puppetnode ansible_ssh_host={{ hostvars['puppetnode']['ansible_ssh_host'] }}
+puppet-node ansible_ssh_host={{ hostvars['puppet-node']['ansible_ssh_host'] }}
 
 [ldap]
 ldap-node ansible_ssh_host={{ hostvars['ldap-node']['ansible_ssh_host'] }}

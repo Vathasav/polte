@@ -1,4 +1,4 @@
-heat_template_version: 2015-10-15
+heat_template_version: 2016-10-14
 
 description: >
   Build machines for deployment of OpenStack.
@@ -12,8 +12,8 @@ parameters:
     type: string
   api_node_names:
     description: List of api node hostnames
-    type: string
-    default: ["api-node0", "api-node1", ]
+    type: comma_delimited_list
+    default: ["api-node0", "api-node1"]
   jumphost_allow_ssh_cidr:
     description: The CIDR where SSH is allowed to the jumphost from.
     type: string
@@ -225,7 +225,7 @@ resources:
   puppet_node:
     type: OS::Nova::Server
     properties:
-      name: puppetnode
+      name: puppet-node
       flavor: { get_param: puppet_node_flavor }
       image: { get_param: puppet_node_image }
       key_name: { get_param: ssh_key_name }

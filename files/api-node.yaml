@@ -1,4 +1,4 @@
-heat_template_version: 2015-10-15
+heat_template_version: 2016-10-14
 
 description: >
   Build machines for deployment of OpenStack.
@@ -38,20 +38,6 @@ parameters:
     type: string
 
 resources:
-#  hb_port:
-#    type: OS::Neutron::Port
-#    properties:
-##      allowed_address_pairs: [{"ip_address": "10.0.0.1"}, {"ip_address": "10.0.0.2"}]
-##
-## This doesn't seem to be supported by heat, yielding error:
-## "Port [uuid] requires a FixedIP in order to be used."
-## For now will do DHCP subnet which requires at least /29.
-#      network: { get_param: hb_network_name }
-#      fixed_ips:
-#        - subnet: { get_param: hb_subnet_name }
-#      security_groups:
-#        - { get_param: ooo_frontend_secgroup }
-
   api_node:
     type: OS::Nova::Server
     properties:
@@ -64,29 +50,19 @@ resources:
       networks:
         - network: { get_param: ooo_network }
         - network: { get_param: ext_network }
-#        - port: { get_resource: hb_port}
         - network: { get_param: hb_network_name }
       metadata: { 'ansible_group': 'api' }
 
-#  api_public_ip:
-#    type: OS::Nova::FloatingIP
-#    properties:
-#      pool: { get_param: floating_ip_pool }
-
-  api_public_ip_neutron:
-    type: OS::Neutron::FloatingIP
+  api_public_ip:
+    type: OS::Nova::FloatingIP
     properties:
-      floating_network: { get_param: floating_ip_pool }
+      pool: { get_param: floating_ip_pool }
 
   api_floating_ip_association:
-#    type: OS::Nova::FloatingIPAssociation
-    type: OS::Neutron::FloatingIPAssociation
+    type: OS::Nova::FloatingIPAssociation
     properties:
-#      floating_ip: { get_resource: api_public_ip }
-      floatingip_id: { get_resource: api_public_ip_neutron }
-#      server_id: { get_resource: api_node }
-      port_id: {get_attr: [api_node, addresses, {get_param: ext_network}, 0, port]}
-#      port_id: {get_attr: [api_node, addresses, {get_param: ooo_network}, 0, port]}
+      floating_ip: { get_resource: api_public_ip }
+      server_id: { get_resource: api_node }
 
 outputs:
   show:
