@@ -1,6 +1,6 @@
 ---
 # for extraction to ansible inventory
-ooo_network_name: "compenvs"
+ooo_network_name: "ooo-mgmt-net"
 # for heat
 heat_environment_file: "../files/example-heat-params.yml"
 # for both

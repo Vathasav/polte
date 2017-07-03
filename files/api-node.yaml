@@ -15,10 +15,10 @@ parameters:
   api_node_image:
     description: The image to use for the VMs running OpenStack APIs.
     type: string
-  ext_network:
+  ext_network_name:
     description: The network to use for the VMs.
     type: string
-  ooo_network:
+  mgmt_network_name:
     description: The network to use for the VMs.
     type: string
   hb_network_name:
@@ -48,8 +48,8 @@ resources:
         - ooo_frontend_secgroup
       name: { get_param: [api_node_names, {get_param: index}] }
       networks:
-        - network: { get_param: ooo_network }
-        - network: { get_param: ext_network }
+        - network: { get_param: mgmt_network_name }
+        - network: { get_param: ext_network_name }
         - network: { get_param: hb_network_name }
       metadata: { 'ansible_group': 'api' }
 

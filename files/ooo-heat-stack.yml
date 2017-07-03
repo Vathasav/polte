@@ -40,12 +40,15 @@ parameters:
     label: Floating IP pool
     description: The pool from which floating IPs should be reserved.
     default: 'public'
-  ooo_network:
-    description: The network to use for the VMs.
+  mgmt_network_name:
+    description: The network to use for VM management.
     type: string
-  ooo_subnet_cidr:
+  mgmt_subnet_name:
     type: string
-    description: The CIDR of the internal subnet of the instances.
+    description: The name of the management subnet.
+  mgmt_subnet_cidr:
+    type: string
+    description: The CIDR of the VM management subnet.
   hb_network_name:
     description: The network to use for heartbeats.
     type: string
@@ -73,31 +76,31 @@ resources:
       rules:
         - protocol: tcp
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 3306
           port_range_max: 3306
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 4444
           port_range_max: 4444
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 4567
           port_range_max: 4567
         - protocol: udp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 4567
           port_range_max: 4567
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 4568
           port_range_max: 4568
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 22
           port_range_max: 22
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 27017
           port_range_max: 27017
 
@@ -108,15 +111,15 @@ resources:
       rules:
         - protocol: tcp
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 8140
           port_range_max: 8140
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 8081
           port_range_max: 8081
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 22
           port_range_max: 22
         - protocol: tcp
@@ -131,7 +134,7 @@ resources:
       rules:
         - protocol: icmp
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 22
           port_range_max: 22
         - protocol: tcp
@@ -145,15 +148,15 @@ resources:
       name: ooo_ldap_secgroup
       rules:
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 22
           port_range_max: 22
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 389
           port_range_max: 389
         - protocol: tcp
-          remote_ip_prefix: { get_param: ooo_subnet_cidr }
+          remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 636
           port_range_max: 636
 
@@ -193,6 +196,29 @@ resources:
       router_id: { get_resource: ext_router }
       subnet: { get_resource: ext_subnet }
 
+  mgmt_network:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: mgmt_network_name }
+
+  mgmt_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      cidr: { get_param: mgmt_subnet_cidr }
+      name: { get_param: mgmt_subnet_name }
+      network: { get_resource: mgmt_network }
+
+  mgmt_router:
+    type: OS::Neutron::Router
+    properties:
+      external_gateway_info: { network: public }
+
+  mgmt_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: mgmt_router }
+      subnet: { get_resource: mgmt_subnet }
+
   api_nodes:
     type: OS::Heat::ResourceGroup
     properties:
@@ -203,6 +229,7 @@ resources:
           index: "%index%"
           api_node_names: { get_param: api_node_names }
           hb_network_name: { get_param: hb_network_name }
+          mgmt_network_name: { get_param: mgmt_network_name }
           ooo_frontend_secgroup: { get_resource: frontend_secgroup }
 
   galera_nodes:
@@ -219,7 +246,7 @@ resources:
           security_groups:
             - { get_resource: backend_secgroup }
           networks:
-            - network: { get_param: ooo_network }
+            - network: { get_resource: mgmt_network }
           metadata: { 'ansible_group': 'galera' }
 
   puppet_node:
@@ -232,7 +259,7 @@ resources:
       security_groups:
         - { get_resource: puppet_secgroup }
       networks:
-        - network: { get_param: ooo_network }
+        - network: { get_resource: mgmt_network }
       metadata: { 'ansible_group': 'puppet' }
 
   ldap_node:
@@ -245,7 +272,7 @@ resources:
       security_groups:
         - { get_resource: ldap_secgroup }
       networks:
-        - network: { get_param: ooo_network }
+        - network: { get_resource: mgmt_network }
       metadata: { 'ansible_group': 'ldap' }
 
   jumphost_public_ip:
