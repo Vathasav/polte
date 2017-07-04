@@ -1,5 +1,5 @@
-# workaround: Prevent dhcp on eth[12] touching routing or DNS
-- hosts: api
+# workaround: Prevent dhcp on eth[012] touching DNS
+- hosts: all
   become: yes
   become_user: root
   gather_facts: yes
@@ -9,15 +9,13 @@
         dest: /etc/sysconfig/network-scripts/ifcfg-{{ item }}
         create: yes
         state: present
+        insertbefore: '^DEVICE'
         block: |
           DEVICE="{{ item }}"
           BOOTPROTO="dhcp"
           ONBOOT="yes"
           PEERDNS="no"
-          DEFROUTE="no"
-      with_items:
-        - eth1
-        - eth2
+      with_items: "{{ ansible_interfaces | difference('lo') }}"
 
 # workaround: change novalocal to openstacklocal
 - hosts: all
@@ -30,13 +28,31 @@
       template:
         src: templates/hosts.j2
         dest: /etc/hosts
-    - name: Add hostname config
+    - name: Add resolv_conf to cloud-init modules
+      blockinfile:
+        dest: /etc/cloud/cloud.cfg
+        create: no
+        state: present
+        insertafter: '^ - ssh'
+        block: |1
+          - resolv_conf
+    - name: Add hostname and resolv config
       blockinfile:
         dest: /etc/cloud/cloud.cfg.d/99_hostname.cfg
         create: yes
         state: present
         block: |
           hostname: {{ inventory_hostname_short }}.openstacklocal
+          manage-resolv-conf: true
+          manage_resolv_conf: true
+          resolv_conf:
+            nameservers: {{ cloud_init_nameservers }}
+            searchdomains:
+              - openstacklocal
+            domain: openstacklocal
+            options:
+              rotate: true
+              timeout: 1
       notify:
         - Reboot
     - meta: flush_handlers
