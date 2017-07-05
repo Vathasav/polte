@@ -5,16 +5,13 @@
   gather_facts: yes
   tasks:
     - name: Modify interface network-scripts
-      blockinfile:
-        dest: /etc/sysconfig/network-scripts/ifcfg-{{ item }}
-        create: yes
-        state: present
-        insertbefore: '^DEVICE'
-        block: |
+      copy:
+        content: |
           DEVICE="{{ item }}"
           BOOTPROTO="dhcp"
           ONBOOT="yes"
           PEERDNS="no"
+        dest: /etc/sysconfig/network-scripts/ifcfg-{{ item }}
       with_items: "{{ ansible_interfaces | difference('lo') }}"
 
 # workaround: change novalocal to openstacklocal

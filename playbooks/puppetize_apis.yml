@@ -5,16 +5,18 @@
   become_user: root
   pre_tasks:
 # workaround: selinux blocks rabbitmq HiPE compilation
-    - shell: sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
-    - shell: sleep 5 && shutdown -r now
-      async: 1
-      poll: 0
-      args:
-        creates: /usr/bin/pip-python
-      ignore_errors: true
-    - meta: clear_host_errors
-    - pause:
-        seconds: 40
+# Obviously this is rather evil as workarounds go. Up to the reader's
+# consideration to either uncomment or (preferably) replace with a proper fix.
+#    - shell: sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
+#    - shell: sleep 5 && shutdown -r now
+#      async: 1
+#      poll: 0
+#      args:
+#        creates: /usr/bin/pip-python
+#      ignore_errors: true
+#    - meta: clear_host_errors
+#    - pause:
+#        seconds: 40
 # workaround: pip provider fails
     - shell: ln -s /usr/bin/pip /usr/bin/pip-python
       args:
@@ -37,6 +39,7 @@
   become_user: root
   roles:
     - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", ignore_puppetize_errors: true }
+# workaround: Flush iptables momentarily 
   post_tasks:
     - shell: iptables -F
 
