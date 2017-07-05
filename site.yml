@@ -1,4 +1,22 @@
 ---
+# Build heat stack
 - include: playbooks/build-heat-stack.yml
-#- include: playbooks/users.yml
-- include: playbooks/puppet.yml
+
+# workaround: Force all nodes to the ".openstacklocal" domain
+- include: playbooks/openstacklocal_domain.yml
+
+# Install and configure LDAP server
+- include: playbooks/ldap_server.yml
+
+# Bootstrap and puppetize puppetmaster
+- include: playbooks/puppetmaster.yml
+
+# Workarounds for liberty/freeze
+- include: playbooks/puppet_environment_mods.yml
+
+# workaround: Force domain again since puppetmaster puppetization touches /etc/hosts
+- include: playbooks/openstacklocal_domain.yml
+
+# Puppetize nodes
+- include: playbooks/puppetize_backends.yml
+- include: playbooks/puppetize_apis.yml

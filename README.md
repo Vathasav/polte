@@ -1,16 +1,20 @@
-#  OoO ansible test
-
-*This is still a work in progress and the description below might not be up to
-date (yet)*
+# OpenStack on OpenStack
 
 * Install roles
-* Add vault file providing vault_puppet_environments_repo var for puppet_node
-* Load keys (see readme in ansible-role-puppetmaster)
-* Run:
 
-`ansible-playbook site.yml --ask-vault-pass`
+`$ ansible-galaxy -r requirements.yml install`
+
+* Load keys (see README.md in ansible-role-puppetmaster)
+* Source openrc
+* Provide host_vars (ansible-vault is presumed):
+  * puppet_environments_repo
+  * vault_openldap_server_rootpw
+  * vault_testuser_ldap_pwd
+* Run (adding --ask-vault-pass if such in use):
+
+`$ ansible-playbook site.yml`
 
 ## Requirements
 
-* Ansible >= 2.2
+* Ansible >= 2.3
 * shade >= 1.8.0

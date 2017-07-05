@@ -11,11 +11,11 @@
         environment:
           - "{{ heat_environment_file }}"
 
-- hosts: localhost
-  gather_facts: no
-  connection: local
-  tasks:
-    - debug: msg="{{ heat_stack.stack.outputs }}"
+# - hosts: localhost
+#   gather_facts: no
+#   connection: local
+#   tasks:
+#     - debug: msg="{{ heat_stack.stack.outputs }}"
 
 - hosts: localhost
   gather_facts: no
@@ -32,30 +32,14 @@
         - "{{ heat_stack.stack.outputs[0].output_value }}"
         - "{{ heat_stack.stack.outputs[1].output_value }}"
         - "{{ heat_stack.stack.outputs[2].output_value }}"
+        - "{{ heat_stack.stack.outputs[3].output_value }}"
       when: item.metadata.ansible_group == "galera"
 
 - hosts: localhost
   gather_facts: no
   connection: local
   tasks:
-    - name: Add api node to inventory
-      add_host:
-        name: "{{ item.name }}"
-        groups: "{{ item.metadata.ansible_group }}"
-        ansible_ssh_host: "{{ item.addresses[ooo_network_name][1].addr }}"
-        ansible_ssh_user: "{{ vm_user_account }}"
-      no_log: yes
-      with_items:
-        - "{{ heat_stack.stack.outputs[0].output_value }}"
-        - "{{ heat_stack.stack.outputs[1].output_value }}"
-        - "{{ heat_stack.stack.outputs[2].output_value }}"
-      when: item.metadata.ansible_group == "api"
-
-- hosts: localhost
-  gather_facts: no
-  connection: local
-  tasks:
-    - name: Add puppet node to inventory
+    - name: Add api nodes to inventory
       add_host:
         name: "{{ item.name }}"
         groups: "{{ item.metadata.ansible_group }}"
@@ -66,7 +50,44 @@
         - "{{ heat_stack.stack.outputs[0].output_value }}"
         - "{{ heat_stack.stack.outputs[1].output_value }}"
         - "{{ heat_stack.stack.outputs[2].output_value }}"
+        - "{{ heat_stack.stack.outputs[3].output_value }}"
+      when: item.metadata.ansible_group == "api"
+
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  tasks:
+    - name: Add puppet node to inventory
+      add_host:
+        name: "{{ item.name }}"
+        groups: "{{ item.metadata.ansible_group }}"
+        ansible_ssh_host: "{{ item.addresses[ooo_network_name][1].addr }}"
+        ansible_ssh_user: "{{ vm_user_account }}"
+      no_log: yes
+      with_items:
+        - "{{ heat_stack.stack.outputs[0].output_value }}"
+        - "{{ heat_stack.stack.outputs[1].output_value }}"
+        - "{{ heat_stack.stack.outputs[2].output_value }}"
+        - "{{ heat_stack.stack.outputs[3].output_value }}"
       when: item.metadata.ansible_group == "puppet"
+
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  tasks:
+    - name: Add LDAP node to inventory
+      add_host:
+        name: "{{ item.name }}"
+        groups: "{{ item.metadata.ansible_group }}"
+        ansible_ssh_host: "{{ item.addresses[ooo_network_name][0].addr }}"
+        ansible_ssh_user: "{{ vm_user_account }}"
+      no_log: yes
+      with_items:
+        - "{{ heat_stack.stack.outputs[0].output_value }}"
+        - "{{ heat_stack.stack.outputs[1].output_value }}"
+        - "{{ heat_stack.stack.outputs[2].output_value }}"
+        - "{{ heat_stack.stack.outputs[3].output_value }}"
+      when: item.metadata.ansible_group == "ldap"
 
 - hosts: localhost
   gather_facts: no
