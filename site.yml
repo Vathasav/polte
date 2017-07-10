@@ -11,7 +11,7 @@
 # Bootstrap and puppetize puppetmaster
 - include: playbooks/puppetmaster.yml
 
-# Workarounds for liberty/freeze
+# workarounds for liberty/freeze
 - include: playbooks/puppet_environment_mods.yml
 
 # workaround: Force domain again since puppetmaster puppetization touches /etc/hosts
@@ -20,3 +20,18 @@
 # Puppetize nodes
 - include: playbooks/puppetize_backends.yml
 - include: playbooks/puppetize_apis.yml
+
+# Post puppetization mods
+- hosts: api[0]
+  become: yes
+  become_user: root
+  tasks:
+    - name: Disable horizon to keystone SSL verification
+      lineinfile:
+        path: /etc/openstack-dashboard/local_settings
+        regexp: '.*OPENSTACK_SSL_NO_VERIFY.*'
+        line: 'OPENSTACK_SSL_NO_VERIFY = True'
+    - name: Change horizon login backend to ldap
+      shell: sed -i 's/native/ldap/' /etc/openstack-dashboard/local_settings
+    - name: Assign cloudops members the admin role
+      shell: source /root/openrc.admintoken;openstack role add --project cloudops --group testgroup admin

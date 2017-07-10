@@ -32,4 +32,7 @@
   become_user: root
   roles:
     - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal" }
+# workaround: Missing ssh tunneling
+  tasks:
+    - shell: iptables -F
 

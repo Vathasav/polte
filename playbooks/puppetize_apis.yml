@@ -39,12 +39,14 @@
   become_user: root
   roles:
     - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", ignore_puppetize_errors: true }
-# workaround: Flush iptables momentarily 
+# workaround: flush iptables momentarily
   post_tasks:
     - shell: iptables -F
 
 # Then we run Puppet on the rest of the API nodes.
-- hosts: api:!api[0]
+#- hosts: api:!api[0]
+# workaround: run for api-node0 too, to expedite initial provisioning
+- hosts: api
   become: true
   become_user: root
   roles:
@@ -54,7 +56,6 @@
 # changes created by the Puppet runs to the PuppetDB get propagated. This also
 # turns fencing on on these servers.
 - hosts: api
-  serial: 1
   become: true
   become_user: root
   pre_tasks:
@@ -67,7 +68,14 @@
   roles:
     - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", ignore_puppetize_errors: true }
 
-# workaround - run once more
+# workaround - run again
+- hosts: api
+  become: true
+  become_user: root
+  roles:
+    - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", ignore_puppetize_errors: true }
+
+# workaround - run again - fail, if there are errors
 - hosts: api
   serial: 1
   become: true
