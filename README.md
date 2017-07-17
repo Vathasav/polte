@@ -12,7 +12,7 @@
   * vault_testuser_ldap_pwd
 * Run (adding --ask-vault-pass if such in use):
 
-`$ ansible-playbook site.yml`
+`$ ansible-playbook -i inventory site.yml`
 
 ## Requirements
 

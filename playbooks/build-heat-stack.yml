@@ -2,6 +2,14 @@
 - hosts: localhost
   gather_facts: no
   tasks:
+    - name: Check if inventory file has been created
+      local_action: stat path="../inventory/ooo_inventory"
+      register: ooo_inventory_file
+
+    - name: End play if inventory exists
+      meta: end_play
+      when: ooo_inventory_file.stat.exists
+
     - name: Build a Heat stack for OpenStack
       register: heat_stack
       os_stack:
@@ -11,16 +19,6 @@
         environment:
           - "{{ heat_environment_file }}"
 
-# - hosts: localhost
-#   gather_facts: no
-#   connection: local
-#   tasks:
-#     - debug: msg="{{ heat_stack.stack.outputs }}"
-
-- hosts: localhost
-  gather_facts: no
-  connection: local
-  tasks:
     - name: Add Galera nodes to inventory
       add_host:
         name: "{{ item.name }}"
@@ -35,10 +33,6 @@
         - "{{ heat_stack.stack.outputs[3].output_value }}"
       when: item.metadata.ansible_group == "galera"
 
-- hosts: localhost
-  gather_facts: no
-  connection: local
-  tasks:
     - name: Add api nodes to inventory
       add_host:
         name: "{{ item.name }}"
@@ -53,10 +47,6 @@
         - "{{ heat_stack.stack.outputs[3].output_value }}"
       when: item.metadata.ansible_group == "api"
 
-- hosts: localhost
-  gather_facts: no
-  connection: local
-  tasks:
     - name: Add puppet node to inventory
       add_host:
         name: "{{ item.name }}"
@@ -71,10 +61,6 @@
         - "{{ heat_stack.stack.outputs[3].output_value }}"
       when: item.metadata.ansible_group == "puppet"
 
-- hosts: localhost
-  gather_facts: no
-  connection: local
-  tasks:
     - name: Add LDAP node to inventory
       add_host:
         name: "{{ item.name }}"
@@ -89,9 +75,5 @@
         - "{{ heat_stack.stack.outputs[3].output_value }}"
       when: item.metadata.ansible_group == "ldap"
 
-- hosts: localhost
-  gather_facts: no
-  connection: local
-  tasks:
     - name: Generate an inventory file
-      template: src=templates/ooo_inventory.j2 dest=/tmp/ooo_inventory
+      template: src=templates/ooo_inventory.j2 dest="../inventory/ooo_inventory"
