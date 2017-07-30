@@ -16,8 +16,14 @@
           password: "{{ vault_testuser_password }}"
         keystone:
           password: "{{ vault_keystone_password }}"
+        heat:
+          password: "{{ vault_heat_password }}"
+        neutron:
+          password: "{{ vault_neutron_password }}"
       openldap_server_groups:
         testgroup:
           - testuser
         service:
           - keystone
+          - heat
+          - neutron

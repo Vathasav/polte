@@ -1,5 +1,5 @@
 ---
-#modifications to liberty/freeze
+#modifications to cccp newton
 - hosts: puppet
   become: true
   become_user: root
@@ -45,4 +45,6 @@
               'filter:authtoken/insecure': value => True;
             }
     - name: workaround - use insecure for tenant creation script
-      shell: sed -i "s/auth=keystone_auth_v3/auth=keystone_auth_v3,insecure=True/" /etc/puppet/environments/ooo/modules/cccp/files/tools/create-tenants.py
+      shell: sed -i "s/auth=neutron_auth)/auth=neutron_auth,verify=False)/" /etc/puppet/environments/ooo/modules/cccp/files/tools/create-tenants.py
+    - name: workaround - ignore public network related errors
+      shell: sed -i "s/python create-tenants.py/python create-tenants.py||\/bin\/true/" /etc/puppet/environments/ooo/modules/cccp/templates/tools/create-tenants.sh.erb
