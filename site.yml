@@ -21,15 +21,5 @@
 - include: playbooks/puppetize_backends.yml
 - include: playbooks/puppetize_apis.yml
 
-# Post puppetization mods
-- hosts: api[0]
-  become: yes
-  become_user: root
-  tasks:
-    - name: Disable horizon to keystone SSL verification
-      lineinfile:
-        path: /etc/openstack-dashboard/local_settings
-        regexp: '.*OPENSTACK_SSL_NO_VERIFY.*'
-        line: 'OPENSTACK_SSL_NO_VERIFY = True'
-    - name: Change horizon login backend to ldap
-      shell: sed -i 's/native/ldap/' /etc/openstack-dashboard/local_settings
+# Post puppetization tasks for Horizon access
+- include: playbooks/post_puppetize.yml
