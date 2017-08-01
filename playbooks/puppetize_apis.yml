@@ -58,7 +58,7 @@
 - hosts: api
   become: true
   become_user: root
-  pre_tasks:
+  post_tasks:
     - name: workaround - use insecure in all /bin/openstack calls due to self-signed cert
       lineinfile:
         path: /bin/openstack
@@ -72,7 +72,7 @@
 - hosts: api
   become: true
   become_user: root
-  pre_tasks:
+  post_tasks:
     - name: workaround - use insecure in all /bin/openstack calls due to self-signed cert
       lineinfile:
         path: /bin/openstack
@@ -81,13 +81,25 @@
       ignore_errors: true
   roles:
     - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", ignore_puppetize_errors: true }
+
+# workaround - once more, with feeling
+- hosts: api
+  become: true
+  become_user: root
+  roles:
+    - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", ignore_puppetize_errors: true }
   post_tasks:
+    - name: workaround - use insecure in all /bin/openstack calls due to self-signed cert
+      lineinfile:
+        path: /bin/openstack
+        insertafter: import\ sys
+        line: "sys.argv.append('--insecure')"
+      ignore_errors: true
     - name: workaround - assign admin role to service members
       shell: source /root/openrc.admintoken;openstack role add --project service --group service admin
       ignore_errors: true
 
-
-# workaround - run again - fail, if there are errors
+# workaround - finally, fail if there are errors
 - hosts: api
   serial: 1
   become: true
