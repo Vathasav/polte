@@ -60,6 +60,7 @@
   become_user: root
   roles:
     - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", ignore_puppetize_errors: true }
+# workaround - after three puppetizes /bin/openstack should be in place and insecure parameter can be injected.
   post_tasks:
     - name: workaround - use insecure in all /bin/openstack calls due to self-signed cert
       lineinfile:
