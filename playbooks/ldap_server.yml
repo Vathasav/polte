@@ -13,7 +13,21 @@
       openldap_enable_user_creation: true
       openldap_server_users:
         testuser:
-          password: "{{ vault_testuser_ldap_pwd }}"
+          password: "{{ vault_testuser_password }}"
+          uid: 90000001
+        keystone:
+          password: "{{ vault_keystone_password }}"
+          uid: 90000002
+        heat:
+          password: "{{ vault_heat_password }}"
+          uid: 90000003
+        neutron:
+          password: "{{ vault_neutron_password }}"
+          uid: 90000004
       openldap_server_groups:
         testgroup:
           - testuser
+        service:
+          - keystone
+          - heat
+          - neutron

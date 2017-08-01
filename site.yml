@@ -33,5 +33,3 @@
         line: 'OPENSTACK_SSL_NO_VERIFY = True'
     - name: Change horizon login backend to ldap
       shell: sed -i 's/native/ldap/' /etc/openstack-dashboard/local_settings
-    - name: Assign cloudops members the admin role
-      shell: source /root/openrc.admintoken;openstack role add --project cloudops --group testgroup admin
