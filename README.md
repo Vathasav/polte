@@ -11,6 +11,8 @@
   * vault_openldap_server_rootpw
   * vault_testuser_password
   * vault_keystone_password
+  * vault_heat_password
+  * vault_neutron_password
 * Run (adding --ask-vault-pass if such in use):
 
 `$ ansible-playbook -i inventory site.yml`
