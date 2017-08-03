@@ -30,7 +30,7 @@
         dest: /etc/cloud/cloud.cfg
         create: no
         state: present
-        insertafter: '^ - ssh'
+        insertafter: '^ - ssh$'
         block: |1
           - resolv_conf
     - name: Add hostname and resolv config
