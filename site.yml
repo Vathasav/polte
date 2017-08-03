@@ -11,7 +11,7 @@
 # Bootstrap and puppetize puppetmaster
 - include: playbooks/puppetmaster.yml
 
-# workarounds for liberty/freeze
+# workarounds for cccp/newton
 - include: playbooks/puppet_environment_mods.yml
 
 # workaround: Force domain again since puppetmaster puppetization touches /etc/hosts

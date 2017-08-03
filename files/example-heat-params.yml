@@ -1,7 +1,7 @@
 # This is an example parameter file for Heat. The minimum set of deployment
 # specific parameters to set for Heat are documented here.
 parameter_defaults:
-  ssh_key_name: janousia
+  ssh_key_name: bender_ro
 
   api_node_flavor: standard.large
   api_node_image: CentOS-7.0
