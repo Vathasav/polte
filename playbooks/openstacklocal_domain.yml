@@ -13,14 +13,8 @@
           PEERDNS="no"
         dest: /etc/sysconfig/network-scripts/ifcfg-{{ item }}
       with_items: "{{ ansible_interfaces | difference('lo') }}"
-
-# workaround: change novalocal to openstacklocal
-- hosts: all
-  become: yes
-  become_user: root
-  gather_facts: yes
-  tasks:
     - meta: clear_host_errors
+# workaround: change novalocal to openstacklocal
     - name: Generate /etc/hosts file
       template:
         src: templates/hosts.j2
