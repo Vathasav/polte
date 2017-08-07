@@ -248,26 +248,27 @@ resources:
           networks:
             - network: { get_resource: mgmt_network }
           metadata: { 'ansible_group': 'galera' }
-#          user_data: |
-#            str_replace:
-#              template:
-#                #!/bin/bash
-#                cat >/etc/cloud/cloud.cfg.d/99_hostname.cfg<<EOF
-#                hostname: $hostname.openstacklocal
-#                manage-resolv-conf: true
-#                manage_resolv_conf: true
-#                resolv_conf:
-#                  nameservers: $nameservers
-#                  searchdomains:
-#                    - openstacklocal
-#                  domain: openstacklocal
-#                  options:
-#                    rotate: true
-#                    timeout: 1
-#                EOF
-#              params:
-#                "$hostname": galera-node%index%
-#                "$nameservers": "['193.166.4.24', '193.166.4.25']
+          user_data_format: RAW
+          user_data:
+            str_replace:
+              params:
+                $hostname: galera-node%index%
+                $nameservers: "['193.166.4.24', '193.166.4.25']"
+              template: |
+                #!/bin/bash
+                cat >/etc/cloud/cloud.cfg.d/99_hostname.cfg<<EOF
+                hostname: $hostname.openstacklocal
+                manage-resolv-conf: true
+                manage_resolv_conf: true
+                resolv_conf:
+                  nameservers: $nameservers
+                  searchdomains:
+                    - openstacklocal
+                  domain: openstacklocal
+                  options:
+                    rotate: true
+                    timeout: 1
+                EOF
 
   puppet_node:
     type: OS::Nova::Server
@@ -281,6 +282,27 @@ resources:
       networks:
         - network: { get_resource: mgmt_network }
       metadata: { 'ansible_group': 'puppet' }
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          params:
+            $hostname: puppet-node
+            $nameservers: "['193.166.4.24', '193.166.4.25']"
+          template: |
+            #!/bin/bash
+            cat >/etc/cloud/cloud.cfg.d/99_hostname.cfg<<EOF
+            hostname: $hostname.openstacklocal
+            manage-resolv-conf: true
+            manage_resolv_conf: true
+            resolv_conf:
+              nameservers: $nameservers
+              searchdomains:
+                - openstacklocal
+              domain: openstacklocal
+              options:
+                rotate: true
+                timeout: 1
+            EOF
 
   ldap_node:
     type: OS::Nova::Server
@@ -294,6 +316,27 @@ resources:
       networks:
         - network: { get_resource: mgmt_network }
       metadata: { 'ansible_group': 'ldap' }
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          params:
+            $hostname: ldap-node
+            $nameservers: "['193.166.4.24', '193.166.4.25']"
+          template: |
+            #!/bin/bash
+            cat >/etc/cloud/cloud.cfg.d/99_hostname.cfg<<EOF
+            hostname: $hostname.openstacklocal
+            manage-resolv-conf: true
+            manage_resolv_conf: true
+            resolv_conf:
+              nameservers: $nameservers
+              searchdomains:
+                - openstacklocal
+              domain: openstacklocal
+              options:
+                rotate: true
+                timeout: 1
+            EOF
 
   jumphost_public_ip:
     type: OS::Nova::FloatingIP

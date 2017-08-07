@@ -27,23 +27,6 @@
         insertafter: '^ - ssh$'
         block: |1
           - resolv_conf
-    - name: Add hostname and resolv config
-      blockinfile:
-        dest: /etc/cloud/cloud.cfg.d/99_hostname.cfg
-        create: yes
-        state: present
-        block: |
-          hostname: {{ inventory_hostname_short }}.openstacklocal
-          manage-resolv-conf: true
-          manage_resolv_conf: true
-          resolv_conf:
-            nameservers: {{ cloud_init_nameservers }}
-            searchdomains:
-              - openstacklocal
-            domain: openstacklocal
-            options:
-              rotate: true
-              timeout: 1
       notify:
         - Reboot
     - meta: flush_handlers
