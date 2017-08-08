@@ -25,3 +25,5 @@ parameter_defaults:
   hb_network_name: ooo-hb-net
   hb_subnet_name: ooo-hb-subnet
   hb_subnet_cidr: 10.0.0.0/29
+
+  cloud_init_nameservers: ["193.166.4.24", "193.166.4.25"]

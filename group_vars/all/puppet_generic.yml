@@ -1,4 +1,4 @@
 ---
 puppetmaster: "{{hostvars['puppet-node']['inventory_hostname']}}"
 puppetmaster_fqdn: "{{hostvars['puppet-node']['inventory_hostname']}}.openstacklocal"
-puppet_environment: ooo
+puppet_environment: ooo 

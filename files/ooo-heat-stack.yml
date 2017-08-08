@@ -67,6 +67,9 @@ parameters:
   ext_subnet_cidr:
     type: string
     description: The CIDR of the ext subnet of API nodes.
+  cloud_init_nameservers:
+    type: comma_delimited_list
+    description: The nameservers to configure via cloud-init.
 
 resources:
   backend_secgroup:
@@ -253,22 +256,8 @@ resources:
             str_replace:
               params:
                 $hostname: galera-node%index%
-                $nameservers: "['193.166.4.24', '193.166.4.25']"
-              template: |
-                #!/bin/bash
-                cat >/etc/cloud/cloud.cfg.d/99_hostname.cfg<<EOF
-                hostname: $hostname.openstacklocal
-                manage-resolv-conf: true
-                manage_resolv_conf: true
-                resolv_conf:
-                  nameservers: $nameservers
-                  searchdomains:
-                    - openstacklocal
-                  domain: openstacklocal
-                  options:
-                    rotate: true
-                    timeout: 1
-                EOF
+                $nameservers: { get_param: cloud_init_nameservers }
+              template: { get_file: user-data-generic.yaml }
 
   puppet_node:
     type: OS::Nova::Server
@@ -287,22 +276,8 @@ resources:
         str_replace:
           params:
             $hostname: puppet-node
-            $nameservers: "['193.166.4.24', '193.166.4.25']"
-          template: |
-            #!/bin/bash
-            cat >/etc/cloud/cloud.cfg.d/99_hostname.cfg<<EOF
-            hostname: $hostname.openstacklocal
-            manage-resolv-conf: true
-            manage_resolv_conf: true
-            resolv_conf:
-              nameservers: $nameservers
-              searchdomains:
-                - openstacklocal
-              domain: openstacklocal
-              options:
-                rotate: true
-                timeout: 1
-            EOF
+            $nameservers: { get_param: cloud_init_nameservers }
+          template: { get_file: user-data-generic.yaml }
 
   ldap_node:
     type: OS::Nova::Server
@@ -321,22 +296,8 @@ resources:
         str_replace:
           params:
             $hostname: ldap-node
-            $nameservers: "['193.166.4.24', '193.166.4.25']"
-          template: |
-            #!/bin/bash
-            cat >/etc/cloud/cloud.cfg.d/99_hostname.cfg<<EOF
-            hostname: $hostname.openstacklocal
-            manage-resolv-conf: true
-            manage_resolv_conf: true
-            resolv_conf:
-              nameservers: $nameservers
-              searchdomains:
-                - openstacklocal
-              domain: openstacklocal
-              options:
-                rotate: true
-                timeout: 1
-            EOF
+            $nameservers: { get_param: cloud_init_nameservers }
+          template: { get_file: user-data-generic.yaml }
 
   jumphost_public_ip:
     type: OS::Nova::FloatingIP

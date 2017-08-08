@@ -14,19 +14,10 @@
         dest: /etc/sysconfig/network-scripts/ifcfg-{{ item }}
       with_items: "{{ ansible_interfaces | difference('lo') }}"
     - meta: clear_host_errors
-# workaround: change novalocal to openstacklocal
     - name: Generate /etc/hosts file
       template:
         src: templates/hosts.j2
         dest: /etc/hosts
-    - name: Add resolv_conf to cloud-init modules
-      blockinfile:
-        dest: /etc/cloud/cloud.cfg
-        create: no
-        state: present
-        insertafter: '^ - ssh$'
-        block: |1
-          - resolv_conf
       notify:
         - Reboot
     - meta: flush_handlers
