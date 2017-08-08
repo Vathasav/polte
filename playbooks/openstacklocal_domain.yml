@@ -22,7 +22,7 @@
         - Reboot
     - meta: flush_handlers
     - pause:
-        seconds: 10
+        seconds: 20
     - meta: clear_host_errors
 
   handlers:

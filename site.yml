@@ -17,9 +17,18 @@
 # workaround: Force domain again since puppetmaster puppetization touches /etc/hosts
 - include: playbooks/openstacklocal_domain.yml
 
-# Puppetize nodes
+# Puppetize backend nodes
 - include: playbooks/puppetize_backends.yml
-- include: playbooks/puppetize_apis.yml
 
-# Post puppetization tasks for Horizon access
-- include: playbooks/post_puppetize.yml
+# Puppetize API nodes
+#- include: playbooks/puppetize_apis.yml
+- include: playbooks/pre_puppetize_apis.yml
+- include: playbooks/puppetize_apis_loop.yml
+  with_items:
+    - init
+    - cluster-formation
+    - openstack-cli-gets-added-after-this
+    - 1st-run-with-accept-selfsigned
+    - 1st-run-with-admin-for-service-project
+    - final
+- include: playbooks/post_puppetize_apis.yml

@@ -1,0 +1,30 @@
+---
+# workarounds for both api nodes
+- hosts: api
+  become: true
+  become_user: root
+  tasks:
+# workaround: selinux blocks rabbitmq HiPE compilation
+# Obviously this is rather evil as workarounds go. Up to the reader's
+# consideration to either uncomment or (preferably) replace with a proper fix.
+    - shell: sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
+    - shell: sleep 5 && shutdown -r now
+      async: 1
+      poll: 0
+      args:
+        creates: /usr/bin/pip-python
+      ignore_errors: true
+    - meta: clear_host_errors
+    - pause:
+        seconds: 40
+# workaround: pip provider fails
+    - shell: ln -s /usr/bin/pip /usr/bin/pip-python
+      args:
+        creates: /usr/bin/pip-python
+# workaround: create NFS share for glance
+    - file:
+        path: /mnt/glance_nfs/cloud_devel
+        state: directory
+        recurse: yes
+        mode: 0755
+    - meta: clear_host_errors
