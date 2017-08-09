@@ -3,20 +3,20 @@
 - hosts: api
   become: true
   become_user: root
-  tasks:
+  pre_tasks:
 # workaround: selinux blocks rabbitmq HiPE compilation
 # Obviously this is rather evil as workarounds go. Up to the reader's
 # consideration to either uncomment or (preferably) replace with a proper fix.
-    - shell: sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
-    - shell: sleep 5 && shutdown -r now
-      async: 1
-      poll: 0
-      args:
-        creates: /usr/bin/pip-python
-      ignore_errors: true
-    - meta: clear_host_errors
-    - pause:
-        seconds: 40
+#    - shell: sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
+#    - shell: sleep 5 && shutdown -r now
+#      async: 1
+#      poll: 0
+#      args:
+#        creates: /usr/bin/pip-python
+#      ignore_errors: true
+#    - meta: clear_host_errors
+#    - pause:
+#        seconds: 40
 # workaround: pip provider fails
     - shell: ln -s /usr/bin/pip /usr/bin/pip-python
       args:
@@ -28,3 +28,7 @@
         recurse: yes
         mode: 0755
     - meta: clear_host_errors
+  roles:
+    - { role: ansible-role-nfs, nfs_exports: { "/mnt/glance_nfs/cloud_devel *(rw,sync,no_root_squash)" } }
+
+
