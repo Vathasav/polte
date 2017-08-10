@@ -4,6 +4,10 @@
   become_user: root
   gather_facts: yes
   tasks:
+    - name: Generate /etc/hosts file
+      template:
+        src: templates/hosts.j2
+        dest: /etc/hosts
     - name: Modify interface network-scripts
       copy:
         content: |
@@ -13,16 +17,11 @@
           PEERDNS="no"
         dest: /etc/sysconfig/network-scripts/ifcfg-{{ item }}
       with_items: "{{ ansible_interfaces | difference('lo') }}"
-    - meta: clear_host_errors
-    - name: Generate /etc/hosts file
-      template:
-        src: templates/hosts.j2
-        dest: /etc/hosts
       notify:
         - Reboot
     - meta: flush_handlers
     - pause:
-        seconds: 20
+        seconds: 30
     - meta: clear_host_errors
 
   handlers:
