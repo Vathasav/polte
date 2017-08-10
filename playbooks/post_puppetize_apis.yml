@@ -1,5 +1,5 @@
 # Post puppetization mods
-- hosts: api[0]
+- hosts: api
   become: yes
   become_user: root
   tasks:

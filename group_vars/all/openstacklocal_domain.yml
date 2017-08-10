@@ -1,2 +1,2 @@
 ---
-cloud_init_nameservers: "['193.166.4.24', '193.166.4.25']"
+#cloud_init_nameservers: "['193.166.4.24', '193.166.4.25']"

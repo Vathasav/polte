@@ -67,6 +67,9 @@ parameters:
   ext_subnet_cidr:
     type: string
     description: The CIDR of the ext subnet of API nodes.
+  cloud_init_nameservers:
+    type: comma_delimited_list
+    description: The nameservers to configure via cloud-init.
 
 resources:
   backend_secgroup:
@@ -248,6 +251,13 @@ resources:
           networks:
             - network: { get_resource: mgmt_network }
           metadata: { 'ansible_group': 'galera' }
+          user_data_format: RAW
+          user_data:
+            str_replace:
+              params:
+                $hostname: galera-node%index%
+                $nameservers: { get_param: cloud_init_nameservers }
+              template: { get_file: user-data-generic.yaml }
 
   puppet_node:
     type: OS::Nova::Server
@@ -261,6 +271,13 @@ resources:
       networks:
         - network: { get_resource: mgmt_network }
       metadata: { 'ansible_group': 'puppet' }
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          params:
+            $hostname: puppet-node
+            $nameservers: { get_param: cloud_init_nameservers }
+          template: { get_file: user-data-generic.yaml }
 
   ldap_node:
     type: OS::Nova::Server
@@ -274,6 +291,13 @@ resources:
       networks:
         - network: { get_resource: mgmt_network }
       metadata: { 'ansible_group': 'ldap' }
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          params:
+            $hostname: ldap-node
+            $nameservers: { get_param: cloud_init_nameservers }
+          template: { get_file: user-data-generic.yaml }
 
   jumphost_public_ip:
     type: OS::Nova::FloatingIP
