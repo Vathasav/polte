@@ -13,7 +13,7 @@
     - name: Build a Heat stack for OpenStack
       register: heat_stack
       os_stack:
-        name: "ooo-stack"
+        name: "{{ heat_stack_name }}"
         state: present
         template: "../files/ooo-heat-stack.yml"
         environment:
