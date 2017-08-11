@@ -4,10 +4,7 @@
   become_user: root
   gather_facts: yes
   tasks:
-    - name: Generate /etc/hosts file
-      template:
-        src: templates/hosts.j2
-        dest: /etc/hosts
+    - meta: clear_host_errors
     - name: Modify interface network-scripts
       copy:
         content: |
@@ -23,6 +20,10 @@
     - pause:
         seconds: 30
     - meta: clear_host_errors
+    - name: Generate /etc/hosts file
+      template:
+        src: templates/hosts.j2
+        dest: /etc/hosts
 
   handlers:
     - name: Reboot
