@@ -49,3 +49,5 @@
       shell: 'sed -i "s/auth=neutron_auth)/auth=neutron_auth,verify=False)/" /etc/puppet/environments/{{puppet_environment}}/modules/cccp/files/tools/create-tenants.py'
     - name: workaround - ignore public network related errors
       shell: 'sed -i "s/python create-tenants.py/python create-tenants.py||\/bin\/true/" /etc/puppet/environments/{{puppet_environment}}/modules/cccp/templates/tools/create-tenants.sh.erb'
+    - name: optimization - disable cinder debug logging
+      shell: 'sed -i "s/\(.*debug.*\)true/\1false/" "/etc/puppet/environments/{{puppet_environment}}/modules/cccp/manifests/role/frontend/api.pp"'
