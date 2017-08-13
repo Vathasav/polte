@@ -21,12 +21,12 @@ parameters:
   mgmt_network_name:
     description: The network to use for the VMs.
     type: string
-  hb_network_name:
-    description: The network to use for heartbeats.
-    type: string
-  hb_subnet_name:
-    description: The network to use for heartbeats.
-    type: string
+#  hb_network_name:
+#    description: The network to use for heartbeats.
+#    type: string
+#  hb_subnet_name:
+#    description: The network to use for heartbeats.
+#    type: string
   floating_ip_pool:
     type: string
     label: Floating IP pool
@@ -53,7 +53,7 @@ resources:
       networks:
         - network: { get_param: mgmt_network_name }
         - network: { get_param: ext_network_name }
-        - network: { get_param: hb_network_name }
+#        - network: { get_param: hb_network_name }
       metadata: { 'ansible_group': 'api' }
       user_data_format: RAW
       user_data:

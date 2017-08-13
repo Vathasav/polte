@@ -8,10 +8,8 @@
 # Install and configure LDAP server
 - include: playbooks/ldap_server.yml
 
-# Bootstrap and puppetize puppetmaster
+# Bootstrap and puppetize puppetmaster, apply modifications to envs
 - include: playbooks/puppetmaster.yml
-
-# workarounds for cccp/newton
 - include: playbooks/puppet_environment_mods.yml
 
 # workaround: Force domain again since puppetmaster puppetization touches /etc/hosts
