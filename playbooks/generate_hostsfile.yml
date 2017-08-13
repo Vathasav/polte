@@ -16,10 +16,10 @@
       with_items: "{{ ansible_interfaces | difference('lo') }}"
       notify:
         - Reboot
+        - Wait
     - meta: flush_handlers
-    - pause:
-        seconds: 30
     - meta: clear_host_errors
+# workaround: Populate hosts file
     - name: Generate /etc/hosts file
       template:
         src: templates/hosts.j2
@@ -31,3 +31,6 @@
       async: 1
       poll: 0
       ignore_errors: true
+    - name: Wait
+      pause:
+        seconds: 30

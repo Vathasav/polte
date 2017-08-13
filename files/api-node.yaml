@@ -4,8 +4,6 @@ description: >
   Build machines for deployment of OpenStack.
 
 parameters:
-  index:
-    type: number
   ssh_key_name:
     description: The name of the SSH key in OpenStack to add to hosts.
     type: string
@@ -15,25 +13,21 @@ parameters:
   api_node_image:
     description: The image to use for the VMs running OpenStack APIs.
     type: string
+  api_node_names:
+    type: comma_delimited_list
+  index:
+    type: number
   ext_network_name:
     description: The network to use for the VMs.
     type: string
   mgmt_network_name:
     description: The network to use for the VMs.
     type: string
-  hb_network_name:
-    description: The network to use for heartbeats.
-    type: string
-  hb_subnet_name:
-    description: The network to use for heartbeats.
-    type: string
   floating_ip_pool:
     type: string
-    label: Floating IP pool
+#    label: Floating IP pool
     description: The pool from which floating IPs should be reserved.
     default: 'public'
-  api_node_names:
-    type: comma_delimited_list
   ooo_frontend_secgroup:
     type: string
   cloud_init_nameservers:
@@ -53,7 +47,6 @@ resources:
       networks:
         - network: { get_param: mgmt_network_name }
         - network: { get_param: ext_network_name }
-        - network: { get_param: hb_network_name }
       metadata: { 'ansible_group': 'api' }
       user_data_format: RAW
       user_data:
