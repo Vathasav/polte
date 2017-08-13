@@ -3,27 +3,17 @@
 parameter_defaults:
   ssh_key_name: bender_ro
 
-  api_node_flavor: standard.large
-  api_node_image: CentOS-7
+  api_node_flavor:    standard.large
+  api_node_image:     CentOS-7
   galera_node_flavor: standard.small
-  galera_node_image: CentOS-7
+  galera_node_image:  CentOS-7
   puppet_node_flavor: standard.large
-  puppet_node_image: CentOS-7
-  ldap_node_flavor: standard.tiny
-  ldap_node_image: CentOS-7
+  puppet_node_image:  CentOS-7
+  ldap_node_flavor:   standard.tiny
+  ldap_node_image:    CentOS-7
 
   jumphost_allow_ssh_cidr: 0.0.0.0/0
-
-#  mgmt_network_name: ooo-mgmt-net
-#  mgmt_subnet_name: ooo-mgmt-subnet
-  mgmt_subnet_cidr: 10.99.99.0/24
-
-#  ext_network_name: ooo-ext-net
-#  ext_subnet_name: ooo-ext-subnet
-  ext_subnet_cidr: 10.42.42.0/24
-
-#  hb_network_name: ooo-hb-net
-#  hb_subnet_name: ooo-hb-subnet
-#  hb_subnet_cidr: 10.0.0.0/29
+  mgmt_subnet_cidr:        10.99.99.0/24
+  ext_subnet_cidr:         10.42.42.0/24
 
   cloud_init_nameservers: ["193.166.4.24", "193.166.4.25"]

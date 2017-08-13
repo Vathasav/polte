@@ -37,33 +37,12 @@ parameters:
     type: string
   floating_ip_pool:
     type: string
-    label: Floating IP pool
+#    label: Floating IP pool
     description: The pool from which floating IPs should be reserved.
     default: 'public'
-#  mgmt_network_name:
-#    description: The network to use for VM management.
-#    type: string
-#  mgmt_subnet_name:
-#    type: string
-#    description: The name of the management subnet.
   mgmt_subnet_cidr:
     type: string
     description: The CIDR of the VM management subnet.
-#  hb_network_name:
-#    description: The network to use for heartbeats.
-#    type: string
-#  hb_subnet_cidr:
-#    type: string
-#    description: The CIDR of the heartbeat subnet of API nodes.
-#  hb_subnet_name:
-#    type: string
-#    description: The name of the heartbeat subnet of API nodes.
-#  ext_network_name:
-#    description: The network to use for API access to internet.
-#    type: string
-#  ext_subnet_name:
-#    type: string
-#    description: The name of the ext subnet of API nodes.
   ext_subnet_cidr:
     type: string
     description: The CIDR of the ext subnet of API nodes.
@@ -163,29 +142,13 @@ resources:
           port_range_min: 636
           port_range_max: 636
 
-#  hb_network:
-#    type: OS::Neutron::Net
-#    properties:
-#      name: { get_param: hb_network_name }
-#
-#  hb_subnet:
-#    type: OS::Neutron::Subnet
-#    properties:
-#      cidr: { get_param: hb_subnet_cidr }
-#      gateway_ip: null
-#      name: { get_param: hb_subnet_name }
-#      network: { get_resource: hb_network }
-
   ext_network:
     type: OS::Neutron::Net
-#    properties:
-#      name: { get_param: ext_network_name }
 
   ext_subnet:
     type: OS::Neutron::Subnet
     properties:
       cidr: { get_param: ext_subnet_cidr }
-#      name: { get_param: ext_subnet_name }
       network: { get_resource: ext_network }
 
   ext_router:
@@ -201,14 +164,11 @@ resources:
 
   mgmt_network:
     type: OS::Neutron::Net
-#    properties:
-#      name: { get_param: mgmt_network_name }
 
   mgmt_subnet:
     type: OS::Neutron::Subnet
     properties:
       cidr: { get_param: mgmt_subnet_cidr }
-#      name: { get_param: mgmt_subnet_name }
       network: { get_resource: mgmt_network }
 
   mgmt_router:
@@ -225,14 +185,12 @@ resources:
   api_nodes:
     type: OS::Heat::ResourceGroup
     properties:
-      count: {get_param: api_server_count}
+      count: { get_param: api_server_count }
       resource_def:
         type: api-node.yaml
         properties:
           index: "%index%"
           api_node_names: { get_param: api_node_names }
-#          hb_network_name: { get_param: hb_network_name }
-#          mgmt_network_name: { get_param: mgmt_network_name }
           mgmt_network_name: { get_resource: mgmt_network }
           ext_network_name: { get_resource: ext_network }
           ooo_frontend_secgroup: { get_resource: frontend_secgroup }
