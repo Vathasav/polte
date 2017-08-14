@@ -25,7 +25,6 @@ parameters:
     type: string
   floating_ip_pool:
     type: string
-#    label: Floating IP pool
     description: The pool from which floating IPs should be reserved.
     default: 'public'
   ooo_frontend_secgroup:

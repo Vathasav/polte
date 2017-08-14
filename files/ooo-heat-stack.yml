@@ -37,7 +37,6 @@ parameters:
     type: string
   floating_ip_pool:
     type: string
-#    label: Floating IP pool
     description: The pool from which floating IPs should be reserved.
     default: 'public'
   mgmt_subnet_cidr:
@@ -54,7 +53,6 @@ resources:
   backend_secgroup:
     type: OS::Neutron::SecurityGroup
     properties:
-      name: ooo_backend_secgroup
       rules:
         - protocol: tcp
         - protocol: tcp
@@ -89,7 +87,6 @@ resources:
   puppet_secgroup:
     type: OS::Neutron::SecurityGroup
     properties:
-      name: ooo_puppet_secgroup
       rules:
         - protocol: tcp
         - protocol: tcp
@@ -112,7 +109,6 @@ resources:
   frontend_secgroup:
     type: OS::Neutron::SecurityGroup
     properties:
-      name: ooo_frontend_secgroup
       rules:
         - protocol: icmp
         - protocol: tcp
@@ -127,7 +123,6 @@ resources:
   ldap_secgroup:
     type: OS::Neutron::SecurityGroup
     properties:
-      name: ooo_ldap_secgroup
       rules:
         - protocol: tcp
           remote_ip_prefix: { get_param: mgmt_subnet_cidr }
