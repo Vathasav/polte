@@ -41,7 +41,7 @@ resources:
       image: { get_param: api_node_image }
       key_name: { get_param: ssh_key_name }
       security_groups:
-        - ooo_frontend_secgroup
+        - { get_param: ooo_frontend_secgroup }
       name: { get_param: [api_node_names, {get_param: index}] }
       networks:
         - network: { get_param: mgmt_network_name }
