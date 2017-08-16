@@ -8,6 +8,10 @@ pipeline {
                 sh '''
                     source env.sh
                     ansible-galaxy -r requirements.yml install
+                    # This should be as generic as possible. F.ex. Referring to the
+                    # puppet_environment name in the Jenkinsfile is probably not the
+                    # way to go. Maybe handle everything via bash scripts that are
+                    # injected OOB and try to detect the checked out branch?
                     ansible-playbook -i inventory site.yml -e "puppet_environment=newton heat_stack_name=testing"
                 '''
             }
