@@ -1,5 +1,6 @@
 #!/bin/bash
 sed -i '/^ - ssh$/a \ - resolv_conf' /etc/cloud/cloud.cfg
+cat $hostname.openstacklocal > /etc/hostname
 cat >/etc/cloud/cloud.cfg.d/99_hostname.cfg<<EOF
 hostname: $hostname.openstacklocal
 manage-resolv-conf: true
