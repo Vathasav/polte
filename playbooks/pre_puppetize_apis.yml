@@ -21,12 +21,12 @@
         creates: /usr/bin/pip-python
 # workaround: create NFS share for glance
     - file:
-        path: /mnt/glance_nfs/cloud_devel
+        path: /srv/glance_nfs/cloud_devel
         state: directory
         recurse: yes
         mode: 0755
     - meta: clear_host_errors
   roles:
-    - { role: ansible-role-nfs, nfs_exports: { "/mnt/glance_nfs/cloud_devel *(rw,sync,no_root_squash)" } }
+    - { role: ansible-role-nfs, nfs_exports: { "/srv/glance_nfs/cloud_devel *(rw,sync,no_root_squash)" } }
 
 
