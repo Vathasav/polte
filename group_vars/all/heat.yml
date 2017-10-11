@@ -3,6 +3,6 @@
 ooo_network_name: "ooo-mgmt-net"
 # for heat
 heat_stack_name: "ooo-stack"
-heat_environment_file: "../files/example-heat-params.yml"
+heat_environment_file: "../files/ooo-heat-params.yml"
 # for both
 vm_user_account: "cloud-user"

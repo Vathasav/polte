@@ -1,15 +1,21 @@
+[ooo:children]
+api
+galera
+puppet
+ldap
+
 [api]
 {% for node in groups['api'] %}
-{{ node }} ansible_ssh_host={{ hostvars[node]['ansible_ssh_host'] }} ansible_ssh_user={{ hostvars[node]['ansible_ssh_user'] }}
+{{ node }} ansible_host={{ hostvars[node]['ansible_host'] }} ansible_user={{ hostvars[node]['ansible_user'] }}
 {% endfor %}
 
 [galera]
 {% for node in groups['galera'] %}
-{{ node }} ansible_ssh_host={{ hostvars[node]['ansible_ssh_host'] }} ansible_ssh_user={{ hostvars[node]['ansible_ssh_user'] }}
+{{ node }} ansible_host={{ hostvars[node]['ansible_host'] }} ansible_user={{ hostvars[node]['ansible_user'] }}
 {% endfor %}
 
 [puppet]
-puppet-node ansible_ssh_host={{ hostvars['puppet-node']['ansible_ssh_host'] }} ansible_ssh_user={{ hostvars['puppet-node']['ansible_ssh_user'] }}
+puppet-node ansible_host={{ hostvars['puppet-node']['ansible_host'] }} ansible_user={{ hostvars['puppet-node']['ansible_user'] }}
 
 [ldap]
-ldap-node ansible_ssh_host={{ hostvars['ldap-node']['ansible_ssh_host'] }} ansible_ssh_user={{ hostvars['ldap-node']['ansible_ssh_user'] }}
+ldap-node ansible_host={{ hostvars['ldap-node']['ansible_host'] }} ansible_user={{ hostvars['ldap-node']['ansible_user'] }}

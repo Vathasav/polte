@@ -1,6 +1,8 @@
 ---
 - hosts: localhost
   gather_facts: no
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
   tasks:
     - name: Check if inventory file has been created
       local_action: stat path="../inventory/ooo_inventory"
@@ -21,15 +23,17 @@
 
     # In the next task, addresses[0] or addresses.0 did not
     # work for some reason.
-    - debug: msg="{{ heat_stack.stack.outputs[0].output_value[0].addresses.keys()[0] }}"
+    - name: Display first found network
+      debug:
+        msg: "{{ heat_stack.stack.outputs[0].output_value[0].addresses.keys()[0] }}"
       register: first_found_network
 
     - name: Add Galera nodes to inventory
       add_host:
         name: "{{ item.name }}"
         groups: "{{ item.metadata.ansible_group }}"
-        ansible_ssh_host: "{{ item.addresses[first_found_network.msg][0].addr }}"
-        ansible_ssh_user: "{{ vm_user_account }}"
+        ansible_host: "{{ item.addresses[first_found_network.msg][0].addr }}"
+        ansible_user: "{{ vm_user_account }}"
       no_log: yes
       with_items:
         - "{{ heat_stack.stack.outputs[0].output_value }}"
@@ -42,8 +46,8 @@
       add_host:
         name: "{{ item.name }}"
         groups: "{{ item.metadata.ansible_group }}"
-        ansible_ssh_host: "{{ item.addresses[first_found_network.msg][0].addr }}"
-        ansible_ssh_user: "{{ vm_user_account }}"
+        ansible_host: "{{ item.addresses[first_found_network.msg][0].addr }}"
+        ansible_user: "{{ vm_user_account }}"
       no_log: yes
       with_items:
         - "{{ heat_stack.stack.outputs[0].output_value }}"
@@ -56,8 +60,8 @@
       add_host:
         name: "{{ item.name }}"
         groups: "{{ item.metadata.ansible_group }}"
-        ansible_ssh_host: "{{ item.addresses[first_found_network.msg][1].addr }}"
-        ansible_ssh_user: "{{ vm_user_account }}"
+        ansible_host: "{{ item.addresses[first_found_network.msg][1].addr }}"
+        ansible_user: "{{ vm_user_account }}"
       no_log: yes
       with_items:
         - "{{ heat_stack.stack.outputs[0].output_value }}"
@@ -70,8 +74,8 @@
       add_host:
         name: "{{ item.name }}"
         groups: "{{ item.metadata.ansible_group }}"
-        ansible_ssh_host: "{{ item.addresses[first_found_network.msg][0].addr }}"
-        ansible_ssh_user: "{{ vm_user_account }}"
+        ansible_host: "{{ item.addresses[first_found_network.msg][0].addr }}"
+        ansible_user: "{{ vm_user_account }}"
       no_log: yes
       with_items:
         - "{{ heat_stack.stack.outputs[0].output_value }}"
@@ -80,5 +84,10 @@
         - "{{ heat_stack.stack.outputs[3].output_value }}"
       when: item.metadata.ansible_group == "ldap"
 
+- hosts: localhost
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  tasks:
     - name: Generate an inventory file
       template: src=templates/ooo_inventory.j2 dest="../inventory/ooo_inventory"
