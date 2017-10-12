@@ -2,7 +2,7 @@
 # Build heat stack
 - include: playbooks/build-heat-stack.yml
 
-# Populate SSH host ketys
+# Populate SSH host keys
 - include: playbooks/populate_ssh_known_hosts.yml
 
 # workaround: Generate hosts file, reboot to enforce openstacklocal domain

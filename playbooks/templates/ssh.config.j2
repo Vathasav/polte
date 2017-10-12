@@ -11,7 +11,7 @@ Host *
 
 # Access to puppet-node as bastion
 Host puppet-node
-  Hostname 193.166.25.152
+  Hostname {{ hostvars['puppet-node']['ansible_host'] }}
 
 #Access cloud nodes via puppet node
 Host api-node*

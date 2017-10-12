@@ -1,14 +1,6 @@
 # workaround: Prevent dhcp on eth[012] touching DNS
 
 - hosts: all
-  gather_facts: no
-  tasks:
-    - name: Add ssh fingerprints from generated inventory file
-      command: ssh-keyscan -H "{{ hostvars[item]['ansible_host'] }}" >> ~/.ssh/known_hosts
-      with_items:
-        - "{{ groups['all'] }}" 
-
-- hosts: all
   become: yes
   become_user: root
   gather_facts: yes
