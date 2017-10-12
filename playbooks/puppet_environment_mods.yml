@@ -52,7 +52,7 @@
     - name: optimization - disable cinder debug logging
       shell: 'sed -i "s/\(.*debug.*\)true/\1false/" "/etc/puppet/environments/{{puppet_environment}}/modules/cccp/manifests/role/frontend/api.pp"'
     - name: workaround - percona repo 404
-      shell: sed -i "s/http.*CentOS_7\//https:\/\/repo.percona.com\/centos\/7\/os\/x86_64\//" "/etc/puppet/environments/{{puppet_environment}}/modules/cccp/manifests/role/backend/galera.pp"
+      shell: sed -i "s/http.*CentOS_7\//https:\/\/repo.percona.com\/centos\/7\/os\/noarch\//" "/etc/puppet/environments/{{puppet_environment}}/modules/cccp/manifests/role/backend/galera.pp"
     - name: workaround - percona repo 404
       shell: sed -i "s/gpgcheck.*/gpgcheck\ \=\>\ \'0\',/" "/etc/puppet/environments/{{puppet_environment}}/modules/cccp/manifests/role/backend/galera.pp"
     - name: workaround - percona repo 404
