@@ -1,2 +1,0 @@
----
-#root_password: "{{ lookup('password', 'credentials/'+ inventory_hostname  +'_rootpw length=15') }}"
