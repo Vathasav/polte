@@ -1,0 +1,24 @@
+# Generic SSH options
+Host *
+  StrictHostKeyChecking no
+  ControlMaster         auto
+  ControlPath           .ssh_controlmaster/socket_%r@%h:%p
+  ControlPersist        10h
+  ForwardAgent          yes
+  User                  cloud-user
+  UserKnownHostsFile=/dev/null
+  LogLevel ERROR
+
+# Access to puppet-node as bastion
+Host puppet-node
+  Hostname {{ hostvars['puppet-node']['ansible_host'] }}
+
+#Access cloud nodes via puppet node
+Host api-node*
+  ProxyCommand ssh -F ssh.config -q puppet-node nc %h 22
+
+Host galera-node*
+  ProxyCommand ssh -F ssh.config -q puppet-node nc %h 22
+
+Host ldap-node*
+  ProxyCommand ssh -F ssh.config -q puppet-node nc %h 22

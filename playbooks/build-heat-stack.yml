@@ -1,0 +1,110 @@
+---
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Check if inventory file has been created
+      local_action: stat path="../inventory/ooo_inventory"
+      register: ooo_inventory_file
+
+    - name: End play if inventory exists
+      meta: end_play
+      when: ooo_inventory_file.stat.exists
+
+    - name: Build a Heat stack for OpenStack
+      register: heat_stack
+      os_stack:
+        name: "{{ heat_stack_name }}"
+        state: present
+        template: "../files/ooo-heat-stack.yml"
+        environment:
+          - "{{ heat_environment_file }}"
+
+    # In the next task, addresses[0] or addresses.0 did not
+    # work for some reason.
+    - name: Display first found network
+      debug:
+        msg: "{{ heat_stack.stack.outputs[0].output_value[0].addresses.keys()[0] }}"
+      register: first_found_network
+
+    - name: Add Galera nodes to inventory
+      add_host:
+        name: "{{ item.name }}"
+        groups: "{{ item.metadata.ansible_group }}"
+        ansible_host: "{{ item.addresses[first_found_network.msg][0].addr }}"
+        ansible_user: "{{ vm_user_account }}"
+      no_log: yes
+      with_items:
+        - "{{ heat_stack.stack.outputs[0].output_value }}"
+        - "{{ heat_stack.stack.outputs[1].output_value }}"
+        - "{{ heat_stack.stack.outputs[2].output_value }}"
+        - "{{ heat_stack.stack.outputs[3].output_value }}"
+      when: item.metadata.ansible_group == "galera"
+
+    - name: Add api nodes to inventory
+      add_host:
+        name: "{{ item.name }}"
+        groups: "{{ item.metadata.ansible_group }}"
+        ansible_host: "{{ item.addresses[first_found_network.msg][0].addr }}"
+        ansible_user: "{{ vm_user_account }}"
+      no_log: yes
+      with_items:
+        - "{{ heat_stack.stack.outputs[0].output_value }}"
+        - "{{ heat_stack.stack.outputs[1].output_value }}"
+        - "{{ heat_stack.stack.outputs[2].output_value }}"
+        - "{{ heat_stack.stack.outputs[3].output_value }}"
+      when: item.metadata.ansible_group == "api"
+
+    - name: Add puppet node to inventory
+      add_host:
+        name: "{{ item.name }}"
+        groups: "{{ item.metadata.ansible_group }}"
+        ansible_host: "{{ item.addresses[first_found_network.msg][1].addr }}"
+        ansible_user: "{{ vm_user_account }}"
+      no_log: yes
+      with_items:
+        - "{{ heat_stack.stack.outputs[0].output_value }}"
+        - "{{ heat_stack.stack.outputs[1].output_value }}"
+        - "{{ heat_stack.stack.outputs[2].output_value }}"
+        - "{{ heat_stack.stack.outputs[3].output_value }}"
+      when: item.metadata.ansible_group == "puppet"
+
+    - name: Add LDAP node to inventory
+      add_host:
+        name: "{{ item.name }}"
+        groups: "{{ item.metadata.ansible_group }}"
+        ansible_host: "{{ item.addresses[first_found_network.msg][0].addr }}"
+        ansible_user: "{{ vm_user_account }}"
+      no_log: yes
+      with_items:
+        - "{{ heat_stack.stack.outputs[0].output_value }}"
+        - "{{ heat_stack.stack.outputs[1].output_value }}"
+        - "{{ heat_stack.stack.outputs[2].output_value }}"
+        - "{{ heat_stack.stack.outputs[3].output_value }}"
+      when: item.metadata.ansible_group == "ldap"
+
+# This task is using the system python so we can use the libselinux-python bindings.
+# This allows us to create the inventory and ssh.config files without a workaround.
+- hosts: localhost
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: "/usr/bin/python"
+  tasks:
+    - name: Generate an inventory file
+      template: src=templates/ooo_inventory.j2 dest="../inventory/ooo_inventory"
+    
+    - name: Generate ssh.config file now we know node IP's
+      template: src=templates/ssh.config.j2 dest="../ssh.config"
+
+    - name: Add ssh control master folder
+      file:
+        path: ../playbooks/.ssh_controlmaster
+        state: directory
+
+- hosts: "{{ hostvars['puppet-node']['inventory_hostname'] }}"
+  gather_facts: no
+  tasks:
+    - name: Install nc for bastion host for ssh.config
+      become: True
+      yum:
+        name: nc
+        state: present

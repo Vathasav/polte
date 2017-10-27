@@ -1,0 +1,14 @@
+---
+- name: Populate ssh known hosts
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: SSH to host
+      local_action: shell ssh -F ../ssh.config -o StrictHostKeyChecking=no -o PasswordAuthentication=no {{ inventory_hostname }} whoami
+
+- name: Verify SSH connectivity
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: SSH to host
+      local_action: shell ssh -F ../ssh.config -o ControlMaster=no -o PasswordAuthentication=no {{ inventory_hostname }} whoami
