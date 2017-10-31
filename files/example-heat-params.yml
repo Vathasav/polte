@@ -15,5 +15,6 @@ parameter_defaults:
   jumphost_allow_ssh_cidr: X.Y.Z.V/32
   mgmt_subnet_cidr:        S.P.Q.R/24
   ext_subnet_cidr:         P.L.U.R/24
+  hb_subnet_cidr:          N.I.C.E/29
 
   cloud_init_nameservers: ["193.166.4.24", "193.166.4.25"]

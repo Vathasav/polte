@@ -1,7 +1,7 @@
 heat_template_version: 2016-10-14
 
 description: >
-  Build machines for deployment of OpenStack.
+  API node template for deployment of OpenStack.
 
 parameters:
   ssh_key_name:
@@ -23,8 +23,12 @@ parameters:
   mgmt_network_name:
     description: The network to use for the VMs.
     type: string
+  hb_network_name:
+    description: The network to use for heartbeats.
+    type: string
   floating_ip_pool:
     type: string
+    label: Floating IP pool
     description: The pool from which floating IPs should be reserved.
     default: 'public'
   ooo_frontend_secgroup:
@@ -40,12 +44,14 @@ resources:
       flavor: { get_param: api_node_flavor }
       image: { get_param: api_node_image }
       key_name: { get_param: ssh_key_name }
-      security_groups:
-        - { get_param: ooo_frontend_secgroup }
+# If networks.port is present, secgroup definition can't be here
+#      security_groups:
+#        - { get_param: ooo_frontend_secgroup }
       name: { get_param: [api_node_names, {get_param: index}] }
       networks:
+        - port: { get_resource: api_ext_port}
         - network: { get_param: mgmt_network_name }
-        - network: { get_param: ext_network_name }
+        - network: { get_param: hb_network_name }
       metadata: { 'ansible_group': 'api' }
       user_data_format: RAW
       user_data:
@@ -53,18 +59,27 @@ resources:
           params:
             $hostname: { get_param: [api_node_names, {get_param: index}] }
             $nameservers: { get_param: cloud_init_nameservers }
-          template: { get_file: user-data-generic.yaml }
+          template: { get_file: user-data-api.yaml }
 
-  api_public_ip:
-    type: OS::Nova::FloatingIP
+  api_ext_port:
+    type: OS::Neutron::Port
     properties:
-      pool: { get_param: floating_ip_pool }
+      network: { get_param: ext_network_name }
+      fixed_ips:
+        - subnet: { get_param: ext_subnet_name }
+      security_groups:
+        - { get_param: ooo_frontend_secgroup }
 
-  api_floating_ip_association:
-    type: OS::Nova::FloatingIPAssociation
+  api_public_ip_neutron:
+    type: OS::Neutron::FloatingIP
     properties:
-      floating_ip: { get_resource: api_public_ip }
-      server_id: { get_resource: api_node }
+      floating_network: { get_param: floating_ip_pool }
+
+  api_floating_ip_association_neutron:
+    type: OS::Neutron::FloatingIPAssociation
+    properties:
+      floatingip_id: { get_resource: api_public_ip_neutron }
+      port_id: {get_attr: [api_node, addresses, {get_param: ext_network_name}, 0, port]}
 
 outputs:
   show:

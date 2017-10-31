@@ -42,6 +42,9 @@ parameters:
   mgmt_subnet_cidr:
     type: string
     description: The CIDR of the VM management subnet.
+  hb_subnet_cidr:
+    type: string
+    description: The CIDR of the heartbeat subnet of API nodes.
   ext_subnet_cidr:
     type: string
     description: The CIDR of the ext subnet of API nodes.
@@ -119,6 +122,20 @@ resources:
           remote_ip_prefix: { get_param: ext_subnet_cidr }
           port_range_min: 1
           port_range_max: 65535
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+#          remote_ip_prefix:
+#            str_replace:
+#              template: address%/mask%
+#              params:
+#                "address%": { get_resource: jumphost_public_ip }
+#                "mask%": 32
+          port_range_min: 22
+          port_range_max: 22
+        - protocol: tcp
+          remote_ip_prefix: 0.0.0.0/0
+          port_range_min: 443
+          port_range_max: 443
 
   ldap_secgroup:
     type: OS::Neutron::SecurityGroup
@@ -136,6 +153,19 @@ resources:
           remote_ip_prefix: { get_param: mgmt_subnet_cidr }
           port_range_min: 636
           port_range_max: 636
+
+  hb_network:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: hb_network_name }
+
+  hb_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      cidr: { get_param: hb_subnet_cidr }
+      gateway_ip: null
+      name: { get_param: hb_subnet_name }
+      network: { get_resource: hb_network }
 
   ext_network:
     type: OS::Neutron::Net
@@ -186,8 +216,8 @@ resources:
         properties:
           index: "%index%"
           api_node_names: { get_param: api_node_names }
-          mgmt_network_name: { get_resource: mgmt_network }
-          ext_network_name: { get_resource: ext_network }
+          hb_network_name: { get_param: hb_network_name }
+          mgmt_network_name: { get_param: mgmt_network_name }
           ooo_frontend_secgroup: { get_resource: frontend_secgroup }
 
   galera_nodes:
