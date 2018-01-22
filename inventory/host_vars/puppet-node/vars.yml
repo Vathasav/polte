@@ -1,2 +1,3 @@
 ---
 puppet_environments_repo: "{{ vault_puppet_environments_repo }}"
+puppet_etc_dir_parent: /etc/puppetlabs
