@@ -64,3 +64,9 @@
       with_items:
         - magnum
         - barbican
+    - name: workaround - modify puppetdb manage_firewall setting
+      blockinfile:
+        path: "{{puppet_etc_dir_parent}}/puppet/environments/{{puppet_environment}}/modules/cccp/manifests/role/puppetmaster.pp"
+        insertbefore: java_args
+        block: |4
+            manage_firewall => false,
