@@ -5,7 +5,7 @@
   become: true
   become_user: root
   roles:
-    - { role: ansible-role-puppetmaster, puppetlabs_repo_url: "https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm", puppet_etc_dir: "/etc/puppetlabs/puppet" }
+    - { role: ansible-role-puppetmaster, puppetlabs_repo_url: "https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm" }
     - { role: ansible-role-squid, internal_net: "10.99.99.0/24" }
   post_tasks:
     - shell: iptables -F
