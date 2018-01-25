@@ -51,7 +51,7 @@
         insertbefore: ^}$
         block: |2
             cinder_api_paste_ini {
-              'filter:authtoken/insecure': value => True;
+              'filter:authtoken/insecure': value => true;
             }
     - name: workaround - use insecure for tenant creation script
       shell: 'sed -i "s/auth=neutron_auth)/auth=neutron_auth,verify=False)/" {{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/files/tools/create-tenants.py'
