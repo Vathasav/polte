@@ -6,7 +6,7 @@
 - src: git@github.com:CSCfi/ansible-role-puppetize.git
   scm: git
   path: roles
-  version: puppetconfmod
+  version: puppetconfmod-p4
 
 - src: https://github.com/geerlingguy/ansible-role-nfs.git
   path: roles
