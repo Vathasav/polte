@@ -44,7 +44,7 @@
       lineinfile:
         path: "{{puppet_code_dir}}/environments/{{puppet_environment}}/modules/nova/manifests/api.pp"
         insertafter: ^\ \ nova_paste_api_ini\ \{
-        line: "    'filter:authtoken/insecure':          value => True;"
+        line: "    'filter:authtoken/insecure':          value  => true;"
     - name: workaround - use insecure due to self-signed cert
       blockinfile:
         path: "{{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cinder/manifests/api.pp"
