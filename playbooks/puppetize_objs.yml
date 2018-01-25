@@ -9,4 +9,4 @@
       args:
         creates: /usr/bin/pip-python
   roles:
-    - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal" }
+    - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", install_alt_puppet_repo: true }

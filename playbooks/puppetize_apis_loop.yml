@@ -5,7 +5,7 @@
   pre_tasks:
     - shell: iptables -F
   roles:
-    - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", ignore_puppetize_errors: true }
+    - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", ignore_puppetize_errors: true, install_alt_puppet_repo: true }
   post_tasks:
 # Rationale: If either puppetize completes, convergence has occurred and the other failure is probably puppetmaster acting up.
 # TODO: AND through api group rather than individual nodes
