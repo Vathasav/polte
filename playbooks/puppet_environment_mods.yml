@@ -72,3 +72,5 @@
         insertbefore: java_args
         block: |4
             manage_firewall => false,
+    - name: p4 - Lobotomize ChanceWeigher
+      shell: 'sed -i "/figuring/,+4d" "{{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/profile/cinder.pp"'
