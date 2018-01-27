@@ -87,7 +87,7 @@ parameters:
   env_type:
     type: string
     default: 'epouta'
-    allowed_values: ['cpouta', 'epouta']
+#    allowed_values: ['cpouta', 'epouta']
 
 resources:
   backend_secgroup:
