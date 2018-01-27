@@ -80,14 +80,6 @@ pipeline {
                 })
             }
         }
-        stage('Puppetize object storage nodes') {
-            steps {
-                echo 'Puppetizing'
-                sh '''
-                    source puppetize-obj.sh
-                '''
-            }
-        }
         stage('Post-puppetize actions') {
             steps {
                 echo 'Deploying'
