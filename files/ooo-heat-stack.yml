@@ -396,10 +396,10 @@ outputs:
   api_nodes_group:
     description: The group of API nodes
     value: { get_attr: [api_nodes, show] }
-  obj_nodes_group:
-    description: The group of object storage nodes
-    value: { get_attr: [obj_nodes, show] }
-    condition: 'for_cpouta'
+#  obj_nodes_group:
+#    description: The group of object storage nodes
+#    value: { get_attr: [obj_nodes, show] }
+#    condition: 'for_cpouta'
   ceph_mon_nodes_group:
     description: The group of Ceph monitor nodes
     value: { get_attr: [ceph_mon_nodes, show] }
