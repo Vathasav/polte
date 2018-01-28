@@ -29,11 +29,12 @@
         regexp: '.*unless.*'
         line: "    unless  => '/bin/true',"
     - name: workaround - disable pacemaker
-      shell: 'sed -i "s/\(^\s*ensure.*running\)/    ensure  => stopped/" {{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/profile/ha/pacemaker/common.pp'
-    - name: p4 - disable pacemaker 2
-      shell: 'sed -i "s/\(^\s*enable.*true\)/#\1/" {{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/profile/ha/pacemaker/common.pp'
-    - name: p4 - Remove corosync authkey file entry
-      shell: 'sed -i "/\/etc\/corosync\/authkey/,+8d" {{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/profile/ha/pacemaker/common.pp'
+      shell: 'sed -i "s/\(^\s*ensure.*running\)/#\1/" {{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/profile/ha/pacemaker/common.pp'
+#      shell: 'sed -i "s/\(^\s*ensure.*running\)/    ensure  => stopped/" {{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/profile/ha/pacemaker/common.pp'
+#    - name: p4 - disable pacemaker 2
+#      shell: 'sed -i "s/\(^\s*enable.*true\)/#\1/" {{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/profile/ha/pacemaker/common.pp'
+#    - name: p4 - Remove corosync authkey file entry
+#      shell: 'sed -i "/\/etc\/corosync\/authkey/,+8d" {{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/profile/ha/pacemaker/common.pp'
     - name: workaround - remove reference to cs_primitive
       shell: 'sed -i "/''pri_cinder_volume/,+34d" {{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/profile/cinder.pp'
     - name: fix issue in openrc.admintoken leaving extra space character into pwd
@@ -59,8 +60,8 @@
       shell: 'sed -i "s/python create-tenants.py/python create-tenants.py||\/bin\/true/" {{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/templates/tools/create-tenants.sh.erb'
     - name: optimization - disable cinder debug logging
       shell: 'sed -i "s/\(.*debug.*\)true/\1false/" "{{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/role/frontend/api.pp"'
-    - name: p4 - disable node_api notify to Cs_primitive
-      shell: 'sed -i "/Class.*node_api/,+2d" "{{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/role/frontend/api.pp"'
+#    - name: p4 - disable node_api notify to Cs_primitive
+#      shell: 'sed -i "/Class.*node_api/,+2d" "{{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/role/frontend/api.pp"'
     - name: workaround - modify db connection strings since tunneling doesn't work
       shell: 'sed -i "s/localhost/galera-node0.openstacklocal/" {{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/profile/{{ item }}.pp'
       with_items:
