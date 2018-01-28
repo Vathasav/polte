@@ -4,6 +4,8 @@
   become_user: root
   pre_tasks:
     - shell: iptables -F
+    - shell: nova-manage api_db sync
+    - shell: nova-manage db sync
   roles:
     - { role: ansible-role-puppetize, ansible_fqdn: "{{inventory_hostname_short}}.openstacklocal", ignore_puppetize_errors: true, install_alt_puppet_repo: true }
   post_tasks:
