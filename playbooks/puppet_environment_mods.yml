@@ -75,3 +75,5 @@
             manage_firewall => false,
     - name: p4 - Lobotomize ChanceWeigher
       shell: 'sed -i "/figuring/,+4d" "{{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/profile/cinder.pp"'
+    - name: p4 - Change keystone mapping table hack target db host
+      shell: 'sed -i "s/127.0.0.1/galera-node0.openstacklocal/" "{{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/profile/keystone.pp"'
