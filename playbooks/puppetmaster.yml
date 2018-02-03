@@ -13,4 +13,3 @@
       shell: 'sed -i "s/512m/2048m/" "{{puppet_code_dir}}/environments/{{puppet_environment}}/modules/cccp/manifests/role/puppetmaster.pp"'
     - shell: 'sed -i "s/Xmx512m/Xmx2048m/" "/etc/sysconfig/puppetdb"'
     - shell: systemctl restart puppetdb
-

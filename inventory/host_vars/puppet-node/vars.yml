@@ -1,5 +1,4 @@
 ---
 puppet_environments_repo: "{{ vault_puppet_environments_repo }}"
 puppet_etc_dir: /etc/puppetlabs/puppet
-#puppet_etc_dir_parent: /etc/puppetlabs
 puppet_code_dir: /etc/puppetlabs/code
